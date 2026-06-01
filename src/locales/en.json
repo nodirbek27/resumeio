@@ -1,0 +1,73 @@
+{
+  "menu": {
+    "obektivka": "Obektivka",
+    "resume": "Resume (CV)",
+    "coverLetter": "Cover Letter"
+  },
+  "title": {
+    "defaultDialogTitle": "Enter information",
+    "productCategory": "Product categories",
+    "characteristics": "Characteristics",
+    "partnersPosition": "Partner position",
+    "productGroups": "Product groups",
+    "id": "ID",
+    "name": "Name",
+    "actions": "Actions",
+    "users": "Users",
+    "dashboard": "Dashboard"
+  },
+  "label": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "add": "Add",
+    "delete": "Delete",
+    "errorMsg": "An error occurred!",
+    "successMsg": "Successfully completed!",
+    "loginSystem": "Sign in",
+    "logoutSystem": "Sign out",
+    "login": "Login",
+    "password": "Password",
+    "remember": "Remember me",
+    "requiresAuth": "Not authorized!",
+    "partners": "Partners",
+    "products": "Products",
+    "noData": "No data found!",
+    "logout": "Logout",
+    "errorAccured": "An error occurred!",
+    "wrongRequest": "Bad request!",
+    "notAllowed": "You don't have permission!",
+    "serverError": "Server error occurred!",
+    "requestTimeout": "Request timed out!",
+    "branches": "Branches",
+    "search": "Search",
+    "type": "Type",
+    "refresh": "Refresh",
+    "territory": "Territory"
+  },
+  "table": {
+    "phone": "Phone",
+    "fio": "Full Name",
+    "position": "Position",
+    "loginTime": "Login time",
+    "status": "Status",
+    "active": "Active",
+    "notActive": "Inactive",
+    "consultant": "Consultant",
+    "colobration": "Collaboration"
+  },
+  "home": {
+    "welcome_message": "Build your professional future with Obektivka",
+    "subtitle": "Create resumes and cover letters that get you hired",
+    "create_resume": "Create Resume",
+    "create_cover_letter": "Create Cover Letter",
+    "feature": {
+      "resume_title": "Professional Resume",
+      "resume_desc": "Create modern resumes that match international standards.",
+      "jobs_title": "Job Ready",
+      "jobs_desc": "Prepare documents that recruiters expect.",
+      "global_title": "Global Opportunities",
+      "global_desc": "Apply confidently for jobs worldwide."
+    }
+  }
+}

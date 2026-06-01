@@ -1,0 +1,755 @@
+<script setup lang="ts">
+import { reactive, ref, onMounted, watch } from 'vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
+
+interface Experience {
+  company: string
+  position: string
+  startDate: string
+  endDate: string
+  description: string
+}
+
+interface Education {
+  school: string
+  degree: string
+  startDate: string
+  endDate: string
+  description: string
+}
+
+interface ResumeData {
+  fullname: string
+  title: string
+  photo: string | null
+  email: string
+  phone: string
+  address: string
+  website: string
+  summary: string
+  skills: string
+  languages: string
+  experience: Experience[]
+  education: Education[]
+}
+
+const STORAGE_KEY = 'resume_builder_data'
+
+const defaultResume: ResumeData = {
+  fullname: '',
+  title: '',
+  photo: null,
+  email: '',
+  phone: '',
+  address: '',
+  website: '',
+  summary: '',
+  skills: '',
+  languages: '',
+  experience: [],
+  education: [],
+}
+
+const demoResume: ResumeData = {
+  fullname: 'Alisher Qodirov',
+  title: 'Senior Frontend Developer',
+  photo: null, // will load a placeholder if needed, or user can upload
+  email: 'alisher.dev@email.com',
+  phone: '+998 90 123 45 67',
+  address: 'Toshkent shahar, Chilonzor',
+  website: 'alisherdev.uz',
+  summary: '5 yildan ortiq tajribaga ega bo\'lgan Senior Frontend Developer. Vue.js, React, TypeScript va zamonaviy veb-texnologiyalar bo\'yicha mutaxassis. Yuqori sifatli va tezkor interfeyslarni yaratishga yo\'naltirilgan.',
+  skills: 'JavaScript, TypeScript, Vue 3, React, Pinia, Tailwind CSS, Quasar, Webpack, Vite, Git, REST API',
+  languages: 'O\'zbek (ona tili), Rus (erkin), Ingliz (B2 - IELTS 6.5)',
+  experience: [
+    {
+      company: 'Digital Solutions LLC',
+      position: 'Senior Frontend Developer',
+      startDate: '2023-01',
+      endDate: 'Hozirgacha',
+      description: 'Vue 3 va TypeScript yordamida yirik ERP tizimini ishlab chiqish va optimallashtirish. Yuklanish vaqtini 40% ga kamaytirish va dizayn tizimini (Design System) noldan yaratish.'
+    },
+    {
+      company: 'Soft Innovation',
+      position: 'Mid Web Developer',
+      startDate: '2021-02',
+      endDate: '2022-12',
+      description: 'React va Redux yordamida 10 dan ortiq elektron tijorat saytlarini va SaaS loyihalarini muvaffaqiyatli topshirish.'
+    }
+  ],
+  education: [
+    {
+      school: 'Toshkent Axborot Texnologiyalari Universiteti',
+      degree: 'Kompyuter muhandisligi (Bakalavr)',
+      startDate: '2017',
+      endDate: '2021',
+      description: 'Kompyuter fanlari va dasturlash asoslari bo\'yicha chuqurlashtirilgan bilim.'
+    }
+  ]
+}
+
+const formData = reactive<ResumeData>({ ...defaultResume })
+const activeTemplate = ref<string>('modern') // modern, classic, creative
+const previewRef = ref<HTMLDivElement | null>(null)
+const isExporting = ref<boolean>(false)
+
+// Load saved data
+onMounted(() => {
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      Object.assign(formData, parsed)
+    } catch (e) {
+      console.error('Error parsing resume data', e)
+    }
+  }
+})
+
+// Auto-save on change
+watch(
+  () => formData,
+  (newVal) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal))
+  },
+  { deep: true }
+)
+
+const loadDemo = () => {
+  Object.assign(formData, demoResume)
+}
+
+const clearAll = () => {
+  if (confirm("Haqiqatan ham barcha ma'lumotlarni o'chirib yubormoqchimisiz?")) {
+    Object.assign(formData, defaultResume)
+    localStorage.removeItem(STORAGE_KEY)
+  }
+}
+
+// Add/Remove experience
+const addExperience = () => {
+  formData.experience.push({ company: '', position: '', startDate: '', endDate: '', description: '' })
+}
+const removeExperience = (index: number) => {
+  formData.experience.splice(index, 1)
+}
+
+// Add/Remove education
+const addEducation = () => {
+  formData.education.push({ school: '', degree: '', startDate: '', endDate: '', description: '' })
+}
+const removeEducation = (index: number) => {
+  formData.education.splice(index, 1)
+}
+
+// Image upload helper
+const fileInput = ref<HTMLInputElement | null>(null)
+const triggerPhotoUpload = () => {
+  fileInput.value?.click()
+}
+const onPhotoSelected = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    if (file.size > 1024 * 1024) {
+      alert("Rasm hajmi 1MB dan kam bo'lishi kerak")
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      formData.photo = reader.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+const removePhoto = () => {
+  formData.photo = null
+}
+
+// PDF Export
+const downloadPDF = async () => {
+  try {
+    isExporting.value = true
+    const html2Canvas = (await import('html2canvas')).default
+    const { jsPDF } = await import('jspdf')
+
+    const element = previewRef.value
+    if (!element) return
+
+    const canvas = await html2Canvas(element, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+    const name = formData.fullname ? formData.fullname.replace(/\s+/g, '_') : 'Resume'
+    pdf.save(`${name}_Resume.pdf`)
+  } catch (err) {
+    console.error(err)
+    alert("PDF yaratishda xatolik yuz berdi")
+  } finally {
+    isExporting.value = false
+  }
+}
+</script>
+
+<template>
+  <div class="min-h-screen bg-slate-50 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Top Action Bar -->
+      <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-100">
+        <div>
+          <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Rezyume Yaratuvchi</h1>
+          <p class="text-slate-500 mt-1">Professional shablonlarda rezyume (CV) to'ldiring va PDF yuklab oling</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <button @click="loadDemo" class="px-4 py-2.5 bg-indigo-50 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-100 transition flex items-center gap-2 text-sm shadow-sm">
+            <q-icon name="mdi-lightning-bolt" size="18px" />
+            Namuna To'ldirish
+          </button>
+          <button @click="clearAll" class="px-4 py-2.5 bg-red-50 text-red-700 font-semibold rounded-xl hover:bg-red-100 transition flex items-center gap-2 text-sm shadow-sm">
+            <q-icon name="mdi-trash-can-outline" size="18px" />
+            Tozalash
+          </button>
+          <button @click="downloadPDF" :disabled="isExporting" class="px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 disabled:bg-indigo-400 transition flex items-center gap-2 text-sm shadow-md">
+            <q-icon v-if="isExporting" name="mdi-loading" class="animate-spin" size="18px" />
+            <q-icon v-else name="mdi-download" size="18px" />
+            PDF Yuklash
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Columns -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        <!-- Left: Forms -->
+        <div class="space-y-6">
+          
+          <!-- Template Selection Card -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+              Shablon Tanlash
+            </h3>
+            <div class="grid grid-cols-3 gap-3">
+              <button 
+                @click="activeTemplate = 'modern'" 
+                :class="[activeTemplate === 'modern' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+              >
+                Modern Minimalist
+              </button>
+              <button 
+                @click="activeTemplate = 'classic'" 
+                :class="[activeTemplate === 'classic' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+              >
+                Classic Professional
+              </button>
+              <button 
+                @click="activeTemplate = 'creative'" 
+                :class="[activeTemplate === 'creative' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+              >
+                Creative Accent
+              </button>
+            </div>
+          </div>
+
+          <!-- General Information -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+              Shaxsiy Ma'lumotlar
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2 flex items-center gap-4 border-b border-slate-100 pb-4">
+                <div @click="triggerPhotoUpload" class="w-20 h-20 rounded-xl bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/20 transition overflow-hidden relative group">
+                  <img v-if="formData.photo" :src="formData.photo" class="w-full h-full object-cover" />
+                  <div v-else class="text-center text-slate-400">
+                    <q-icon name="mdi-camera-outline" size="24px" />
+                    <span class="text-[10px] block mt-0.5">Rasm 3x4</span>
+                  </div>
+                  <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onPhotoSelected" />
+                </div>
+                <div v-if="formData.photo" class="space-y-1">
+                  <span class="text-sm font-semibold text-slate-700">Profil rasmi yuklandi</span>
+                  <button @click="removePhoto" class="block text-xs font-semibold text-red-600 hover:text-red-700">Rasm o'chirish</button>
+                </div>
+                <div v-else class="text-xs text-slate-500">
+                  Ushbu rasm rezyumening tegishli joyida aks etadi (max: 1MB).
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">F.I.O.</label>
+                <input v-model="formData.fullname" type="text" placeholder="Misol: Alisher Qodirov" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Mutaxassislik (Lavozim)</label>
+                <input v-model="formData.title" type="text" placeholder="Misol: Senior Frontend Developer" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Elektron Pochta</label>
+                <input v-model="formData.email" type="email" placeholder="example@email.com" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Telefon Raqam</label>
+                <input v-model="formData.phone" type="text" placeholder="+998 90 123 45 67" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Yashash Manzili</label>
+                <input v-model="formData.address" type="text" placeholder="Toshkent, O'zbekiston" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Veb-sayt / Portfolio</label>
+                <input v-model="formData.website" type="text" placeholder="github.com/profile" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">O'zingiz haqingizda (Summary)</label>
+                <textarea v-model="formData.summary" rows="3" placeholder="Soha bo'yicha qisqacha ma'lumot, tajriba va maqsadlaringiz..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills and Languages -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+              Ko'nikmalar va Tillar
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Professional ko'nikmalar (Vergul bilan ajrating)</label>
+                <input v-model="formData.skills" type="text" placeholder="HTML, CSS, JavaScript, Vue" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Chet tillari (Vergul bilan ajrating)</label>
+                <input v-model="formData.languages" type="text" placeholder="O'zbek, Ingliz, Rus" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-slate-800" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Experience Section -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+                Ish Tajribasi
+              </h3>
+              <button @click="addExperience" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 text-xs transition flex items-center gap-1">
+                <q-icon name="mdi-plus" size="14px" /> Qo'shish
+              </button>
+            </div>
+            
+            <div v-if="formData.experience.length === 0" class="text-center py-6 text-slate-400 border-2 border-dashed border-slate-100 rounded-xl text-sm">
+              Ish tajribasi qo'shilmagan
+            </div>
+            
+            <div v-for="(exp, index) in formData.experience" :key="index" class="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-4 relative">
+              <button @click="removeExperience(index)" class="absolute top-3 right-3 text-red-500 hover:text-red-700 transition">
+                <q-icon name="mdi-close" size="18px" />
+              </button>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kompaniya / Tashkilot</label>
+                  <input v-model="exp.company" type="text" placeholder="Misol: Soft LLC" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Lavozim</label>
+                  <input v-model="exp.position" type="text" placeholder="Misol: Frontend Developer" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Boshlangan Sana</label>
+                  <input v-model="exp.startDate" type="text" placeholder="Misol: 2021-06" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tugallangan Sana (yoki Hozirgacha)</label>
+                  <input v-model="exp.endDate" type="text" placeholder="Misol: Hozirgacha" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Vazifalar va Yutuqlar haqida</label>
+                  <textarea v-model="exp.description" rows="2" placeholder="Loyiha ta'riflari, qilgan ishlaringiz..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Education Section -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
+                Ta'lim Ma'lumoti
+              </h3>
+              <button @click="addEducation" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 text-xs transition flex items-center gap-1">
+                <q-icon name="mdi-plus" size="14px" /> Qo'shish
+              </button>
+            </div>
+
+            <div v-if="formData.education.length === 0" class="text-center py-6 text-slate-400 border-2 border-dashed border-slate-100 rounded-xl text-sm">
+              Ta'lim ma'lumotlari qo'shilmagan
+            </div>
+
+            <div v-for="(edu, index) in formData.education" :key="index" class="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-4 relative">
+              <button @click="removeEducation(index)" class="absolute top-3 right-3 text-red-500 hover:text-red-700 transition">
+                <q-icon name="mdi-close" size="18px" />
+              </button>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">O'quv maskani / Universitet</label>
+                  <input v-model="edu.school" type="text" placeholder="Misol: TATU" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mutaxassislik darajasi</label>
+                  <input v-model="edu.degree" type="text" placeholder="Misol: Dasturiy ta'minot (Bakalavr)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Boshlangan Yil</label>
+                  <input v-model="edu.startDate" type="text" placeholder="Misol: 2017" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tugallangan Yil (yoki Davom etmoqda)</label>
+                  <input v-model="edu.endDate" type="text" placeholder="Misol: 2021" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Qo'shimcha ma'lumot (Ixtiyoriy)</label>
+                  <textarea v-model="edu.description" rows="2" placeholder="Kurs loyihalari, sertifikatlar..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- Right: Live Preview -->
+        <div class="lg:sticky lg:top-8 space-y-4">
+          <div class="flex items-center justify-between px-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jonli Rezyume Preview</span>
+            <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Format A4 (210mm)</span>
+          </div>
+
+          <!-- A4 Template Wrapper -->
+          <div class="bg-white shadow-xl border border-slate-200 overflow-hidden w-full" style="aspect-ratio: 1 / 1.414;" ref="previewRef">
+            
+            <!-- TEMPLATE 1: Modern Minimalist -->
+            <div v-if="activeTemplate === 'modern'" class="h-full grid grid-cols-12 text-slate-800 bg-white" style="font-family: 'Inter', sans-serif;">
+              <!-- Sidebar -->
+              <div class="col-span-4 bg-slate-900 text-slate-100 p-6 flex flex-col justify-between h-full">
+                <div>
+                  <!-- Profile Photo -->
+                  <div class="flex justify-center mb-6">
+                    <img v-if="formData.photo" :src="formData.photo" class="w-24 h-24 rounded-full object-cover border-2 border-slate-700 shadow-md" />
+                    <div v-else class="w-24 h-24 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-slate-400 text-xs">
+                      No Photo
+                    </div>
+                  </div>
+
+                  <!-- Contact details -->
+                  <h4 class="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3 pb-1 border-b border-slate-800">Aloqa</h4>
+                  <ul class="space-y-3.5 text-xs text-slate-300">
+                    <li v-if="formData.phone" class="flex items-start gap-2">
+                      <q-icon name="mdi-phone" class="text-indigo-400 mt-0.5" size="14px" />
+                      <span class="break-all">{{ formData.phone }}</span>
+                    </li>
+                    <li v-if="formData.email" class="flex items-start gap-2">
+                      <q-icon name="mdi-email" class="text-indigo-400 mt-0.5" size="14px" />
+                      <span class="break-all">{{ formData.email }}</span>
+                    </li>
+                    <li v-if="formData.address" class="flex items-start gap-2">
+                      <q-icon name="mdi-map-marker" class="text-indigo-400 mt-0.5" size="14px" />
+                      <span>{{ formData.address }}</span>
+                    </li>
+                    <li v-if="formData.website" class="flex items-start gap-2">
+                      <q-icon name="mdi-web" class="text-indigo-400 mt-0.5" size="14px" />
+                      <span class="break-all">{{ formData.website }}</span>
+                    </li>
+                  </ul>
+
+                  <!-- Skills details -->
+                  <h4 class="text-xs font-bold uppercase tracking-widest text-indigo-400 mt-8 mb-3 pb-1 border-b border-slate-800">Ko'nikmalar</h4>
+                  <div class="flex flex-wrap gap-1.5">
+                    <span v-for="skill in formData.skills.split(',').map(s => s.trim()).filter(Boolean)" :key="skill" class="text-[10px] bg-slate-800 text-slate-200 px-2 py-0.5 rounded font-mono">
+                      {{ skill }}
+                    </span>
+                    <span v-if="!formData.skills" class="text-xs text-slate-500 italic">Kiritilmagan</span>
+                  </div>
+
+                  <!-- Languages details -->
+                  <h4 class="text-xs font-bold uppercase tracking-widest text-indigo-400 mt-8 mb-3 pb-1 border-b border-slate-800">Tillar</h4>
+                  <p class="text-xs text-slate-300 leading-relaxed whitespace-pre-line">{{ formData.languages || 'Kiritilmagan' }}</p>
+                </div>
+
+                <div class="text-[10px] text-slate-600 text-center border-t border-slate-800 pt-3">
+                  Modern Minimalist
+                </div>
+              </div>
+
+              <!-- Main Content -->
+              <div class="col-span-8 p-8 flex flex-col justify-between h-full bg-slate-50/30">
+                <div>
+                  <!-- Header Name / Title -->
+                  <div class="mb-6">
+                    <h2 class="text-3xl font-extrabold text-slate-900 leading-tight">{{ formData.fullname || 'F.I.O. Kiriting' }}</h2>
+                    <p class="text-sm font-bold text-indigo-600 uppercase tracking-wider mt-1">{{ formData.title || 'Mutaxassislik' }}</p>
+                  </div>
+
+                  <!-- Summary Section -->
+                  <div v-if="formData.summary" class="mb-6">
+                    <p class="text-xs text-slate-600 leading-relaxed italic">{{ formData.summary }}</p>
+                  </div>
+
+                  <!-- Experience Section -->
+                  <div class="mb-6">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-1">Ish Tajribasi</h3>
+                    <div class="space-y-4">
+                      <div v-for="(exp, idx) in formData.experience" :key="idx" class="text-xs">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <h4 class="font-bold text-slate-800 text-sm">{{ exp.position }}</h4>
+                            <p class="text-slate-600 font-semibold">{{ exp.company }}</p>
+                          </div>
+                          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{{ exp.startDate }} - {{ exp.endDate }}</span>
+                        </div>
+                        <p class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">{{ exp.description }}</p>
+                      </div>
+                      <p v-if="formData.experience.length === 0" class="text-xs text-slate-400 italic">Tajriba qo'shilmagan</p>
+                    </div>
+                  </div>
+
+                  <!-- Education Section -->
+                  <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-1">Ta'lim</h3>
+                    <div class="space-y-4">
+                      <div v-for="(edu, idx) in formData.education" :key="idx" class="text-xs">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <h4 class="font-bold text-slate-800 text-sm">{{ edu.degree }}</h4>
+                            <p class="text-slate-600 font-semibold">{{ edu.school }}</p>
+                          </div>
+                          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{{ edu.startDate }} - {{ edu.endDate }}</span>
+                        </div>
+                        <p v-if="edu.description" class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">{{ edu.description }}</p>
+                      </div>
+                      <p v-if="formData.education.length === 0" class="text-xs text-slate-400 italic">Ta'lim qo'shilmagan</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-[10px] text-slate-400 text-right">
+                  PDF formatda chop etildi
+                </div>
+              </div>
+            </div>
+
+            <!-- TEMPLATE 2: Classic Professional -->
+            <div v-else-if="activeTemplate === 'classic'" class="h-full p-8 flex flex-col justify-between text-slate-800 bg-white" style="font-family: 'Georgia', serif;">
+              <div>
+                <!-- Top Centered Header -->
+                <div class="text-center pb-4 border-b-2 border-slate-800 mb-6">
+                  <h2 class="text-3xl font-extrabold tracking-wide text-slate-900">{{ formData.fullname || 'F.I.O. Kiriting' }}</h2>
+                  <p class="text-xs font-bold uppercase tracking-widest text-indigo-700 mt-1.5" style="font-family: sans-serif;">{{ formData.title || 'Mutaxassislik' }}</p>
+                  
+                  <!-- Contact line -->
+                  <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-slate-500 mt-3 font-sans">
+                    <span v-if="formData.email"><q-icon name="mdi-email" /> {{ formData.email }}</span>
+                    <span v-if="formData.phone"><q-icon name="mdi-phone" /> {{ formData.phone }}</span>
+                    <span v-if="formData.address"><q-icon name="mdi-map-marker" /> {{ formData.address }}</span>
+                    <span v-if="formData.website"><q-icon name="mdi-web" /> {{ formData.website }}</span>
+                  </div>
+                </div>
+
+                <!-- Professional Summary -->
+                <div v-if="formData.summary" class="mb-6">
+                  <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-1">Muxtasar</h3>
+                  <p class="text-xs text-slate-700 leading-relaxed text-justify">{{ formData.summary }}</p>
+                </div>
+
+                <!-- Experience Section -->
+                <div class="mb-6">
+                  <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3 font-sans border-b border-slate-200 pb-1">Ish Tajribasi</h3>
+                  <div class="space-y-4">
+                    <div v-for="(exp, idx) in formData.experience" :key="idx" class="text-xs">
+                      <div class="flex justify-between items-baseline font-sans">
+                        <div class="flex gap-2">
+                          <strong class="text-slate-900 text-sm font-serif">{{ exp.position }}</strong>
+                          <span class="text-slate-500">|</span>
+                          <span class="text-slate-700 font-medium">{{ exp.company }}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-semibold">{{ exp.startDate }} — {{ exp.endDate }}</span>
+                      </div>
+                      <p class="text-slate-600 mt-1.5 text-[11px] leading-relaxed text-justify whitespace-pre-wrap">{{ exp.description }}</p>
+                    </div>
+                    <p v-if="formData.experience.length === 0" class="text-xs text-slate-400 italic font-sans">Tajriba qo'shilmagan</p>
+                  </div>
+                </div>
+
+                <!-- Education Section -->
+                <div class="mb-6">
+                  <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3 font-sans border-b border-slate-200 pb-1">Ta'lim</h3>
+                  <div class="space-y-3">
+                    <div v-for="(edu, idx) in formData.education" :key="idx" class="text-xs">
+                      <div class="flex justify-between items-baseline font-sans">
+                        <div class="flex gap-2">
+                          <strong class="text-slate-900 text-sm font-serif">{{ edu.degree }}</strong>
+                          <span class="text-slate-500">|</span>
+                          <span class="text-slate-700 font-medium">{{ edu.school }}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-semibold">{{ edu.startDate }} — {{ edu.endDate }}</span>
+                      </div>
+                      <p v-if="edu.description" class="text-slate-600 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">{{ edu.description }}</p>
+                    </div>
+                    <p v-if="formData.education.length === 0" class="text-xs text-slate-400 italic font-sans">Ta'lim qo'shilmagan</p>
+                  </div>
+                </div>
+
+                <!-- Grid of Skills and Languages -->
+                <div class="grid grid-cols-2 gap-6">
+                  <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-1">Ko'nikmalar</h3>
+                    <p class="text-xs text-slate-700 leading-relaxed font-sans">{{ formData.skills || 'Kiritilmagan' }}</p>
+                  </div>
+                  <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-1">Tillar</h3>
+                    <p class="text-xs text-slate-700 leading-relaxed font-sans">{{ formData.languages || 'Kiritilmagan' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[10px] text-slate-400 text-center font-sans">
+                Professional Classic Template
+              </div>
+            </div>
+
+            <!-- TEMPLATE 3: Creative Accent -->
+            <div v-else class="h-full flex flex-col justify-between text-slate-800 bg-white" style="font-family: 'Outfit', sans-serif;">
+              <div>
+                <!-- Colorful top banner header -->
+                <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white p-6 relative">
+                  <div class="flex justify-between items-start gap-4">
+                    <div>
+                      <h2 class="text-2xl font-black tracking-wide">{{ formData.fullname || 'F.I.O. Kiriting' }}</h2>
+                      <p class="text-xs font-semibold text-indigo-200 uppercase tracking-widest mt-1">{{ formData.title || 'Mutaxassislik' }}</p>
+                      
+                      <!-- Contact details small grid -->
+                      <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-indigo-100 mt-4 font-mono">
+                        <span v-if="formData.email" class="truncate"><q-icon name="mdi-email" /> {{ formData.email }}</span>
+                        <span v-if="formData.phone"><q-icon name="mdi-phone" /> {{ formData.phone }}</span>
+                        <span v-if="formData.address"><q-icon name="mdi-map-marker" /> {{ formData.address }}</span>
+                        <span v-if="formData.website" class="truncate"><q-icon name="mdi-web" /> {{ formData.website }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Small round image -->
+                    <div v-if="formData.photo" class="w-16 h-16 rounded-full border-2 border-indigo-500 overflow-hidden flex-shrink-0 bg-slate-900 shadow-md">
+                      <img :src="formData.photo" class="w-full h-full object-cover" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Main content in columns -->
+                <div class="p-6 grid grid-cols-12 gap-6">
+                  
+                  <!-- Left side -->
+                  <div class="col-span-8 space-y-5">
+                    
+                    <!-- Summary -->
+                    <div v-if="formData.summary">
+                      <h3 class="text-xs font-extrabold uppercase tracking-widest text-indigo-800 mb-2">Profil</h3>
+                      <p class="text-xs text-slate-600 leading-relaxed text-justify">{{ formData.summary }}</p>
+                    </div>
+
+                    <!-- Experience -->
+                    <div>
+                      <h3 class="text-xs font-extrabold uppercase tracking-widest text-indigo-800 mb-2">Tajriba</h3>
+                      <div class="space-y-4">
+                        <div v-for="(exp, idx) in formData.experience" :key="idx" class="text-xs relative pl-4 border-l-2 border-indigo-100">
+                          <!-- Bullet dot -->
+                          <span class="w-2 h-2 rounded-full bg-indigo-600 absolute -left-[5px] top-1"></span>
+                          <div class="flex justify-between items-start font-semibold">
+                            <h4 class="text-slate-800 font-bold">{{ exp.position }}</h4>
+                            <span class="text-[9px] text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">{{ exp.startDate }} - {{ exp.endDate }}</span>
+                          </div>
+                          <p class="text-slate-500 font-medium text-[10px] mt-0.5">{{ exp.company }}</p>
+                          <p class="text-slate-600 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">{{ exp.description }}</p>
+                        </div>
+                        <p v-if="formData.experience.length === 0" class="text-xs text-slate-400 italic">Tajriba qo'shilmagan</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Right side -->
+                  <div class="col-span-4 space-y-5">
+                    
+                    <!-- Education -->
+                    <div>
+                      <h3 class="text-xs font-extrabold uppercase tracking-widest text-indigo-800 mb-2">Ta'lim</h3>
+                      <div class="space-y-3">
+                        <div v-for="(edu, idx) in formData.education" :key="idx" class="text-[11px]">
+                          <strong class="text-slate-800 block text-xs">{{ edu.degree }}</strong>
+                          <span class="text-slate-500 block text-[10px]">{{ edu.school }}</span>
+                          <span class="text-[9px] font-mono text-slate-400 block">{{ edu.startDate }} - {{ edu.endDate }}</span>
+                        </div>
+                        <p v-if="formData.education.length === 0" class="text-xs text-slate-400 italic">Ta'lim qo'shilmagan</p>
+                      </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div>
+                      <h3 class="text-xs font-extrabold uppercase tracking-widest text-indigo-800 mb-2">Ko'nikmalar</h3>
+                      <div class="flex flex-wrap gap-1.5">
+                        <span v-for="skill in formData.skills.split(',').map(s => s.trim()).filter(Boolean)" :key="skill" class="text-[10px] bg-slate-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">
+                          {{ skill }}
+                        </span>
+                        <span v-if="!formData.skills" class="text-xs text-slate-400 italic">Kiritilmagan</span>
+                      </div>
+                    </div>
+
+                    <!-- Languages -->
+                    <div>
+                      <h3 class="text-xs font-extrabold uppercase tracking-widest text-indigo-800 mb-2">Tillar</h3>
+                      <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line">{{ formData.languages || 'Kiritilmagan' }}</p>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[10px] text-slate-400 text-center pb-4">
+                Creative Accent Template
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@400;600;800;900&family=Georgia&display=swap');
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
