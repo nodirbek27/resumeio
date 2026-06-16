@@ -64,7 +64,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lff" container style="height: 100vh" class="bg-grey-2">
+  <q-layout view="lHh Lpr lff" container style="height: 100vh" class="app-bg">
 
     <!-- ================= HEADER ================= -->
     <q-header :class="[
@@ -81,7 +81,8 @@ onUnmounted(() => {
 
           <!-- Logo -->
           <RouterLink to="/" class="logo">
-            Resumeio
+            <span class="logo-icon">R</span>
+            ResumeIO
           </RouterLink>
 
           <q-space />
@@ -189,19 +190,30 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* APP BG */
+:global(.app-bg) {
+  background: #f8fafc !important;
+}
+
 /* HEADER */
 .main-header {
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .header-transparent {
-  background: transparent;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-shadow: none;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .header-scrolled {
-  background: #ffffff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 16px rgba(0, 0, 0, 0.07);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
 /* TOOLBAR */
@@ -223,28 +235,49 @@ onUnmounted(() => {
 /* LOGO */
 .logo {
   text-decoration: none;
-  font-weight: bold;
-  font-size: 20px;
-  color: black;
+  font-weight: 800;
+  font-size: 18px;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.3px;
+}
+
+.logo-icon {
+  width: 30px;
+  height: 30px;
+  background: var(--q-primary);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+  flex-shrink: 0;
 }
 
 /* MENU */
 .menu-link {
   text-decoration: none;
-  color: black;
+  color: #475569;
   padding: 6px 14px;
   border-radius: 8px;
-  transition: all 0.25s ease;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .menu-link:hover {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.05);
+  color: #1e293b;
 }
 
 .active-menu {
   background: var(--q-primary);
-  color: white;
-  font-style: italic;
+  color: white !important;
+  font-weight: 600;
 }
 
 /* THEME COLORS */

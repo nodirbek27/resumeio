@@ -70,7 +70,7 @@ const clearAllData = () => {
       <div class="obektivka-topbar">
         <div>
           <h1 class="obektivka-heading">Obyektivka (MA'LUMOTNOMA)</h1>
-          <p class="obektivka-sub">Ma'lumotlarni to'ldiring va PDF formatda yuklab oling</p>
+          <p class="obektivka-sub">Ma'lumotlarni to'ldiring va yuklab oling</p>
         </div>
         <div class="obektivka-actions">
           <ObektivkaExport :formData="formData" :previewRef="previewRef" />

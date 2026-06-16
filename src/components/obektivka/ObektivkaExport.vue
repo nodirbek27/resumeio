@@ -58,43 +58,102 @@ const downloadPDF = async () => {
   }
 }
 
-const downloadJSON = (formData: ObektivkaFormData) => {
-  try {
-    const json = JSON.stringify(formData, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${formData.familiya}_${formData.ism}_obektivka.json`
-    link.click()
-    URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('JSON download error:', error)
-    alert('JSON yuklab olishda xatolik yuz berdi')
-  }
+const downloadWord = async () => {
+  const { generateObektivkaDocx } = await import('@/utils/generateObektivkaDocx')
+
+  await generateObektivkaDocx(props.formData)
 }
 </script>
 
 <template>
-  <div class="flex gap-3">
-    <button @click="downloadPDF" type="button"
-      class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 font-medium shadow-md">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
+  <div class="download-actions">
+    <!-- PDF BUTTON -->
+    <button @click="downloadPDF" type="button" class="btn btn-pdf">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
       </svg>
-      PDF yuklab olish
+      <span>PDF yuklash</span>
     </button>
 
-    <button @click="downloadJSON(formData)" type="button"
-      class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 font-medium shadow-md">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
+    <!-- WORD BUTTON -->
+    <button @click="downloadWord" type="button" class="btn btn-word">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
       </svg>
-      Word yuklab olish
+      <span>Word yuklash</span>
     </button>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.download-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+/* base button */
+.btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+
+  padding: 12px 0;
+  border-radius: 12px;
+  border: none;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  user-select: none;
+}
+
+/* icon */
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* PDF button */
+.btn-pdf {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.btn-pdf:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+}
+
+.btn-pdf:active {
+  transform: scale(0.98);
+}
+
+/* Word button */
+.btn-word {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+.btn-word:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.35);
+}
+
+.btn-word:active {
+  transform: scale(0.98);
+}
+
+/* mobile */
+@media (max-width: 480px) {
+  .download-actions {
+    flex-direction: column;
+  }
+}
+</style>
