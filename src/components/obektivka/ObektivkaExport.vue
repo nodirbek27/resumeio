@@ -92,7 +92,7 @@ const downloadJSON = (formData: ObektivkaFormData) => {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
       </svg>
-      JSON yuklab olish
+      Word yuklab olish
     </button>
   </div>
 </template>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useQuasar } from 'quasar'
 
 const { locale } = useI18n()
+const $q = useQuasar()
 
 interface CoverLetterData {
   senderName: string
@@ -55,6 +57,7 @@ const activeTemplate = ref<string>('modern')
 const previewRef = ref<HTMLDivElement | null>(null)
 const isExporting = ref<boolean>(false)
 const selectedRole = ref<string>('developer')
+const mobileTab = ref<'form' | 'preview'>('form')
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
@@ -267,11 +270,29 @@ const downloadPDF = async () => {
         </div>
       </div>
 
+      <!-- Mobile Tab Switcher -->
+      <div v-if="$q.screen.lt.lg" class="flex gap-2 mb-4">
+        <button
+          @click="mobileTab = 'form'"
+          :class="mobileTab === 'form' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border border-slate-200'"
+          class="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
+        >
+          <q-icon name="mdi-pencil-outline" size="16px" /> To'ldirish
+        </button>
+        <button
+          @click="mobileTab = 'preview'"
+          :class="mobileTab === 'preview' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border border-slate-200'"
+          class="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
+        >
+          <q-icon name="mdi-eye-outline" size="16px" /> Ko'rish
+        </button>
+      </div>
+
       <!-- Main Columns -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        
+
         <!-- Left: Form Editor -->
-        <div class="space-y-6">
+        <div class="space-y-6" :class="{ 'hidden': $q.screen.lt.lg && mobileTab !== 'form' }">
 
           <!-- Template Selection -->
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -415,7 +436,7 @@ const downloadPDF = async () => {
         </div>
 
         <!-- Right: Live Preview -->
-        <div class="lg:sticky lg:top-8 space-y-4">
+        <div class="lg:sticky lg:top-8 space-y-4" :class="{ 'hidden': $q.screen.lt.lg && mobileTab !== 'preview' }">
           <div class="flex items-center justify-between px-2">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jonli Cover Letter Preview</span>
             <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Format A4 (210mm)</span>

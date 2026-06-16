@@ -81,7 +81,7 @@ onUnmounted(() => {
 
           <!-- Logo -->
           <RouterLink to="/" class="logo">
-            Obektivka
+            Resumeio
           </RouterLink>
 
           <q-space />
@@ -213,6 +213,7 @@ onUnmounted(() => {
 /* CONTAINER */
 .header-container {
   width: 100%;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 16px;
   display: flex;

@@ -57,17 +57,18 @@
     "colobration": "Collaboration"
   },
   "home": {
-    "welcome_message": "Build your professional future with Obektivka",
-    "subtitle": "Create resumes and cover letters that get you hired",
+    "welcome_message": "Create your professional documents",
+    "subtitle": "Resume, Cover Letter and Obektivka — all in one place, ready to download as PDF",
     "create_resume": "Create Resume",
     "create_cover_letter": "Create Cover Letter",
+    "create_obektivka": "Create Obektivka",
     "feature": {
       "resume_title": "Professional Resume",
       "resume_desc": "Create modern resumes that match international standards.",
-      "jobs_title": "Job Ready",
-      "jobs_desc": "Prepare documents that recruiters expect.",
-      "global_title": "Global Opportunities",
-      "global_desc": "Apply confidently for jobs worldwide."
+      "cover_letter_title": "Cover Letter",
+      "cover_letter_desc": "Write a cover letter that impresses recruiters.",
+      "obektivka_title": "Obektivka (Official CV)",
+      "obektivka_desc": "Fill in the official obektivka document and print it."
     }
   }
 }
