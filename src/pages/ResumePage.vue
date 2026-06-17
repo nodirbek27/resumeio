@@ -4,8 +4,10 @@ import { useQuasar } from 'quasar'
 import DonateDialog from '@/components/DonateDialog.vue'
 
 const $q = useQuasar()
-const mobileTab = ref<'form' | 'preview'>('form')
+const showPreviewMobile = ref(false)
 const showDonateDialog = ref(false)
+// Matches Tailwind's `lg` breakpoint (1024px) used for the grid-cols layout switch
+const isCompactLayout = computed(() => $q.screen.width < 1024)
 
 // Color helpers for accent theming
 function hexToRgb(hex: string) {
@@ -167,8 +169,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updatePreviewScale)
 })
 
-// Recalculate when switching to the Preview tab on mobile (element becomes visible)
-watch(mobileTab, async () => {
+// Recalculate when opening the mobile preview overlay (element becomes visible)
+watch(showPreviewMobile, async () => {
   await nextTick()
   updatePreviewScale()
 })
@@ -299,29 +301,11 @@ const downloadPDF = async () => {
         </div>
       </div>
 
-      <!-- Mobile Tab Switcher -->
-      <div v-if="$q.screen.lt.lg" class="flex gap-2 mb-4">
-        <button
-          @click="mobileTab = 'form'"
-          :class="mobileTab === 'form' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border border-slate-200'"
-          class="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
-        >
-          <q-icon name="mdi-pencil-outline" size="16px" /> Fill In
-        </button>
-        <button
-          @click="mobileTab = 'preview'"
-          :class="mobileTab === 'preview' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border border-slate-200'"
-          class="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
-        >
-          <q-icon name="mdi-eye-outline" size="16px" /> Preview
-        </button>
-      </div>
-
       <!-- Main Columns -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
         <!-- Left: Forms -->
-        <div class="space-y-6" :class="{ 'hidden': $q.screen.lt.lg && mobileTab !== 'form' }">
+        <div class="space-y-6">
 
           <!-- Template Selection Card -->
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -558,8 +542,22 @@ const downloadPDF = async () => {
         </div>
 
         <!-- Right: Live Preview -->
-        <div class="lg:sticky lg:top-8 space-y-4" :class="{ 'hidden': $q.screen.lt.lg && mobileTab !== 'preview' }">
-          <div class="flex items-center justify-between px-2">
+        <div
+          class="space-y-4"
+          :class="isCompactLayout
+            ? (showPreviewMobile ? 'mobile-preview-overlay' : 'hidden')
+            : 'lg:sticky lg:top-8'"
+        >
+          <!-- Mobile overlay top bar with a clear Back button -->
+          <div v-if="isCompactLayout && showPreviewMobile" class="preview-overlay-bar">
+            <button type="button" class="back-btn" @click="showPreviewMobile = false">
+              <q-icon name="mdi-arrow-left" size="20px" />
+              <span>Back</span>
+            </button>
+            <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-semibold">A4 Format (210mm)</span>
+          </div>
+
+          <div v-else class="flex items-center justify-between px-2">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Live Resume Preview</span>
             <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">A4 Format (210mm)</span>
           </div>
@@ -1037,6 +1035,18 @@ const downloadPDF = async () => {
       </div>
     </div>
 
+    <!-- Mobile floating preview button -->
+    <q-btn
+      v-if="isCompactLayout && !showPreviewMobile"
+      color="indigo-6"
+      icon="mdi-eye-outline"
+      label="Preview"
+      unelevated
+      rounded
+      class="mobile-preview-fab"
+      @click="showPreviewMobile = true"
+    />
+
   </div>
 
   <DonateDialog v-model="showDonateDialog" @confirm="downloadPDF" />
@@ -1047,6 +1057,59 @@ const downloadPDF = async () => {
 
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+.mobile-preview-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 5000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  padding: 12px 20px !important;
+  font-weight: 700 !important;
+}
+
+.mobile-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5001;
+  background: #f8fafc;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+}
+
+.preview-overlay-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  padding: 12px 0;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 6px 10px 6px 4px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.back-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 @keyframes spin {
