@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { ObektivkaFormData } from '@/utils/obektivkaStorage'
+import DonateDialog from '@/components/DonateDialog.vue'
 
 interface Props {
   formData: ObektivkaFormData
@@ -7,6 +9,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const showDonateDialog = ref(false)
+const pendingAction = ref<'pdf' | 'word' | null>(null)
 
 const downloadPDF = async () => {
   try {
@@ -60,15 +65,30 @@ const downloadPDF = async () => {
 
 const downloadWord = async () => {
   const { generateObektivkaDocx } = await import('@/utils/generateObektivkaDocx')
-
   await generateObektivkaDocx(props.formData)
+}
+
+const requestPdf = () => {
+  pendingAction.value = 'pdf'
+  showDonateDialog.value = true
+}
+
+const requestWord = () => {
+  pendingAction.value = 'word'
+  showDonateDialog.value = true
+}
+
+const onConfirmDownload = () => {
+  if (pendingAction.value === 'pdf') downloadPDF()
+  else if (pendingAction.value === 'word') downloadWord()
+  pendingAction.value = null
 }
 </script>
 
 <template>
   <div class="download-actions">
     <!-- PDF BUTTON -->
-    <button @click="downloadPDF" type="button" class="btn btn-pdf">
+    <button @click="requestPdf" type="button" class="btn btn-pdf">
       <svg class="icon" viewBox="0 0 24 24">
         <path fill="currentColor" d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
       </svg>
@@ -76,13 +96,15 @@ const downloadWord = async () => {
     </button>
 
     <!-- WORD BUTTON -->
-    <button @click="downloadWord" type="button" class="btn btn-word">
+    <button @click="requestWord" type="button" class="btn btn-word">
       <svg class="icon" viewBox="0 0 24 24">
         <path fill="currentColor" d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8l-6-4m6 4l6-4" />
       </svg>
       <span>Word yuklash</span>
     </button>
   </div>
+
+  <DonateDialog v-model="showDonateDialog" @confirm="onConfirmDownload" />
 </template>
 
 <style scoped>

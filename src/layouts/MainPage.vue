@@ -4,7 +4,6 @@ import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { menus } from '@/router'
 import { useCommonStore } from '@/stores/common'
-import type { Locales } from '@/types/common'
 
 const $q = useQuasar()
 const { t } = useI18n()
@@ -16,25 +15,6 @@ const store = useCommonStore()
 ======================= */
 const isMobile = computed(() => $q.screen.lt.sm)
 const drawer = ref(false)
-
-/* =======================
-  Language
-======================= */
-const language = computed<Locales>({
-  get: () => store.currentLocale,
-  set: (locale) => {
-    store.setLocale(locale)
-    window.location.reload()
-  },
-})
-
-/* =======================
-  Language label for display
-======================= */
-const languageLabel = computed(() => {
-  const found = store.languages.find(l => l.locale === language.value)
-  return found?.label || language.value.toUpperCase()
-})
 
 /* =======================
   Theme
@@ -97,35 +77,18 @@ onUnmounted(() => {
 
           <q-space />
 
-          <!-- Language Switcher -->
-          <BaseBtn v-if="!isMobile" outline icon="mdi-translate" :label="languageLabel">
-            <q-menu>
-              <q-list>
-                <q-item
-                  v-for="item in store.languages"
-                  :key="item.locale"
-                  clickable
-                  @click="language = item.locale"
-                  :class="language === item.locale ? 'bg-primary text-white' : ''"
-                >
-                  <q-item-section>{{ item.label }}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </BaseBtn>
-
           <!-- Theme picker -->
-          <BaseBtn v-if="!isMobile" class="q-ml-sm" padding="sm" outline rounded icon="mdi-palette-outline">
+          <BaseBtn v-if="!isMobile" padding="sm" outline rounded icon="mdi-palette-outline">
             <q-menu>
               <q-list style="min-width: 180px" class="q-pa-sm">
-                <q-item-label header class="text-caption">Rang Tanlash</q-item-label>
+                <q-item-label header class="text-caption">Choose color</q-item-label>
                 <div class="row justify-evenly q-pa-sm q-gutter-sm">
-                  <div class="color" style="background:#239f55" @click="changeTheme('#239f55')" title="Yashil" />
-                  <div class="color" style="background:#3f3a72" @click="changeTheme('#3f3a72')" title="To'q ko'k" />
-                  <div class="color" style="background:#6a224f" @click="changeTheme('#6a224f')" title="Qoʻngʻir-qizil" />
-                  <div class="color" style="background:#193779" @click="changeTheme('#193779')" title="Ko'k" />
-                  <div class="color" style="background:#c0392b" @click="changeTheme('#c0392b')" title="Qizil" />
-                  <div class="color" style="background:#7f8c8d" @click="changeTheme('#7f8c8d')" title="Kulrang" />
+                  <div class="color" style="background:#239f55" @click="changeTheme('#239f55')" title="Green" />
+                  <div class="color" style="background:#3f3a72" @click="changeTheme('#3f3a72')" title="Dark blue" />
+                  <div class="color" style="background:#6a224f" @click="changeTheme('#6a224f')" title="Maroon" />
+                  <div class="color" style="background:#193779" @click="changeTheme('#193779')" title="Blue" />
+                  <div class="color" style="background:#c0392b" @click="changeTheme('#c0392b')" title="Red" />
+                  <div class="color" style="background:#7f8c8d" @click="changeTheme('#7f8c8d')" title="Gray" />
                 </div>
               </q-list>
             </q-menu>
@@ -150,23 +113,8 @@ onUnmounted(() => {
 
         <q-separator class="q-my-md" />
 
-        <!-- Language in mobile drawer -->
-        <q-item-label header class="text-caption">🌐 Til / Язык / Language</q-item-label>
-        <q-item
-          v-for="item in store.languages"
-          :key="item.locale"
-          clickable
-          v-ripple
-          @click="language = item.locale; drawer = false"
-          :class="language === item.locale ? 'bg-primary text-white' : ''"
-        >
-          <q-item-section>{{ item.label }}</q-item-section>
-        </q-item>
-
-        <q-separator class="q-my-md" />
-
         <!-- Theme colors in mobile drawer -->
-        <q-item-label header class="text-caption">🎨 Rang</q-item-label>
+        <q-item-label header class="text-caption">Color theme</q-item-label>
         <div class="row justify-evenly q-pa-sm q-gutter-sm q-mb-sm">
           <div class="color" style="background:#239f55" @click="changeTheme('#239f55')" />
           <div class="color" style="background:#3f3a72" @click="changeTheme('#3f3a72')" />
