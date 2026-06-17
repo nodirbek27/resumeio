@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted, watch, computed } from 'vue'
+import { reactive, ref, onMounted, onBeforeUnmount, watch, computed, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import DonateDialog from '@/components/DonateDialog.vue'
 
@@ -57,6 +57,19 @@ const isExporting = ref<boolean>(false)
 const selectedRole = ref<string>('developer')
 const mobileTab = ref<'form' | 'preview'>('form')
 
+// Fixed "real" preview size, scaled down visually to fit any screen width
+const PREVIEW_WIDTH = 700
+const PREVIEW_HEIGHT = Math.round(PREVIEW_WIDTH * 1.414)
+const previewWrapRef = ref<HTMLDivElement | null>(null)
+const previewScale = ref(1)
+let resizeObserver: ResizeObserver | null = null
+
+const updatePreviewScale = () => {
+  if (!previewWrapRef.value) return
+  const w = previewWrapRef.value.clientWidth
+  if (w > 0) previewScale.value = w / PREVIEW_WIDTH
+}
+
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
@@ -67,6 +80,23 @@ onMounted(() => {
       console.error('Error parsing cover letter data', e)
     }
   }
+
+  updatePreviewScale()
+  if (previewWrapRef.value) {
+    resizeObserver = new ResizeObserver(() => updatePreviewScale())
+    resizeObserver.observe(previewWrapRef.value)
+  }
+  window.addEventListener('resize', updatePreviewScale)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  window.removeEventListener('resize', updatePreviewScale)
+})
+
+watch(mobileTab, async () => {
+  await nextTick()
+  updatePreviewScale()
 })
 
 watch(
@@ -135,6 +165,7 @@ const generateLetter = () => {
 
 // PDF Export
 const downloadPDF = async () => {
+  const savedScale = previewScale.value
   try {
     isExporting.value = true
     const html2Canvas = (await import('html2canvas')).default
@@ -142,6 +173,9 @@ const downloadPDF = async () => {
 
     const element = previewRef.value
     if (!element) return
+
+    previewScale.value = 1
+    await nextTick()
 
     const canvas = await html2Canvas(element, {
       scale: 2,
@@ -161,6 +195,7 @@ const downloadPDF = async () => {
     console.error(err)
     alert('An error occurred while generating the PDF')
   } finally {
+    previewScale.value = savedScale
     isExporting.value = false
   }
 }
@@ -173,7 +208,7 @@ const downloadPDF = async () => {
       <!-- Top Action Bar -->
       <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-100">
         <div>
-          <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Cover Letter Builder</h1>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Cover Letter Builder</h1>
           <p class="text-slate-500 mt-1">Write professional cover letters for employers</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -219,25 +254,25 @@ const downloadPDF = async () => {
               <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
               Choose Template
             </h3>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <button
                 @click="activeTemplate = 'modern'"
                 :class="[activeTemplate === 'modern' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
-                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
               >
                 Modern Minimalist
               </button>
               <button
                 @click="activeTemplate = 'classic'"
                 :class="[activeTemplate === 'classic' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
-                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
               >
                 Classic Professional
               </button>
               <button
                 @click="activeTemplate = 'creative'"
                 :class="[activeTemplate === 'creative' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
-                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition col-span-2 sm:col-span-1"
               >
                 Creative Accent
               </button>
@@ -251,11 +286,11 @@ const downloadPDF = async () => {
               Auto Text Generator (Sample)
             </h3>
             <p class="text-xs text-slate-500 mb-4">Choose your field and quickly insert sample professional text:</p>
-            <div class="flex items-center gap-3">
-              <select v-model="selectedRole" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-sm text-slate-700">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <select v-model="selectedRole" class="w-full sm:flex-1 sm:min-w-0 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-sm text-slate-700">
                 <option v-for="(label, key) in roleLabels" :key="key" :value="key">{{ label }}</option>
               </select>
-              <button @click="generateLetter" class="px-4 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 text-sm transition flex items-center gap-1.5 shadow-md">
+              <button @click="generateLetter" class="w-full sm:w-auto justify-center px-4 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 text-sm transition flex items-center gap-1.5 shadow-md">
                 <q-icon name="mdi-text-box-plus-outline" size="18px" />
                 Generate
               </button>
@@ -361,8 +396,19 @@ const downloadPDF = async () => {
             <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">A4 Format (210mm)</span>
           </div>
 
-          <!-- A4 Canvas -->
-          <div class="bg-white shadow-xl border border-slate-200 overflow-hidden w-full text-slate-800" style="aspect-ratio: 1 / 1.414;" ref="previewRef">
+          <!-- A4 Canvas: rendered at a fixed "real" size, then visually scaled
+               to fit the column width — looks identical on mobile and desktop -->
+          <div ref="previewWrapRef" class="w-full" :style="{ height: (PREVIEW_HEIGHT * previewScale) + 'px' }">
+            <div
+              class="bg-white shadow-xl border border-slate-200 overflow-hidden text-slate-800"
+              :style="{
+                width: PREVIEW_WIDTH + 'px',
+                height: PREVIEW_HEIGHT + 'px',
+                transform: 'scale(' + previewScale + ')',
+                transformOrigin: 'top left',
+              }"
+              ref="previewRef"
+            >
 
             <!-- TEMPLATE 1: Modern Minimalist -->
             <div v-if="activeTemplate === 'modern'" class="h-full grid grid-cols-12 bg-white" style="font-family: 'Inter', sans-serif;">
@@ -548,6 +594,7 @@ const downloadPDF = async () => {
               </div>
             </div>
 
+            </div>
           </div>
         </div>
 
