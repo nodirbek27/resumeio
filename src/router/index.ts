@@ -13,12 +13,6 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '' },
       },
       {
-        path: 'obektivka',
-        name: 'obektivka',
-        component: () => import('@/pages/ObektivkaPage.vue'),
-        meta: { title: 'menu.obektivka' },
-      },
-      {
         path: 'resume',
         name: 'resume',
         component: () => import('@/pages/ResumePage.vue'),
@@ -29,6 +23,12 @@ const routes: RouteRecordRaw[] = [
         name: 'coverLetter',
         component: () => import('@/pages/CoverLetterPage.vue'),
         meta: { title: 'menu.coverLetter' },
+      },
+      {
+        path: 'obektivka',
+        name: 'obektivka',
+        component: () => import('@/pages/ObektivkaPage.vue'),
+        meta: { title: 'menu.obektivka' },
       },
     ],
   },

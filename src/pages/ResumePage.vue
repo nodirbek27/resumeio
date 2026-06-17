@@ -1,11 +1,34 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted, watch } from 'vue'
+import { reactive, ref, onMounted, watch, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import DonateDialog from '@/components/DonateDialog.vue'
 
 const $q = useQuasar()
 const mobileTab = ref<'form' | 'preview'>('form')
 const showDonateDialog = ref(false)
+
+// Color helpers for accent theming
+function hexToRgb(hex: string) {
+  const clean = hex.replace('#', '')
+  const bigint = parseInt(clean, 16)
+  return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 }
+}
+function tint(hex: string, amount: number) {
+  const { r, g, b } = hexToRgb(hex)
+  const nr = Math.round(r + (255 - r) * amount)
+  const ng = Math.round(g + (255 - g) * amount)
+  const nb = Math.round(b + (255 - b) * amount)
+  return `rgb(${nr}, ${ng}, ${nb})`
+}
+function shade(hex: string, amount: number) {
+  const { r, g, b } = hexToRgb(hex)
+  const nr = Math.round(r * (1 + amount))
+  const ng = Math.round(g * (1 + amount))
+  const nb = Math.round(b * (1 + amount))
+  return `rgb(${Math.max(0, nr)}, ${Math.max(0, ng)}, ${Math.max(0, nb)})`
+}
+
+const accentSwatches = ['#4f46e5', '#2563eb', '#0d9488', '#16a34a', '#d97706', '#dc2626', '#db2777', '#475569']
 
 interface Experience {
   company: string
@@ -36,6 +59,7 @@ interface ResumeData {
   languages: string
   experience: Experience[]
   education: Education[]
+  accentColor: string
 }
 
 const STORAGE_KEY = 'resume_builder_data'
@@ -53,6 +77,7 @@ const defaultResume: ResumeData = {
   languages: '',
   experience: [],
   education: [],
+  accentColor: '#4f46e5',
 }
 
 const demoResume: ResumeData = {
@@ -90,13 +115,18 @@ const demoResume: ResumeData = {
       endDate: '2021',
       description: 'In-depth study of computer science and programming fundamentals.'
     }
-  ]
+  ],
+  accentColor: '#4f46e5',
 }
 
 const formData = reactive<ResumeData>({ ...defaultResume })
-const activeTemplate = ref<string>('modern') // modern, classic, creative
+const activeTemplate = ref<string>('modern') // modern, classic, creative, minimal, sidebar-right
 const previewRef = ref<HTMLDivElement | null>(null)
 const isExporting = ref<boolean>(false)
+
+const accentSoft = computed(() => tint(formData.accentColor, 0.9))
+const accentSoft2 = computed(() => tint(formData.accentColor, 0.82))
+const accentDark = computed(() => shade(formData.accentColor, -0.35))
 
 // Load saved data
 onMounted(() => {
@@ -261,7 +291,7 @@ const downloadPDF = async () => {
               <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
               Choose Template
             </h3>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-3 gap-3 mb-6">
               <button
                 @click="activeTemplate = 'modern'"
                 :class="[activeTemplate === 'modern' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
@@ -283,6 +313,43 @@ const downloadPDF = async () => {
               >
                 Creative Accent
               </button>
+              <button
+                @click="activeTemplate = 'minimal'"
+                :class="[activeTemplate === 'minimal' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+              >
+                Minimal Lines
+              </button>
+              <button
+                @click="activeTemplate = 'sidebar-right'"
+                :class="[activeTemplate === 'sidebar-right' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+                class="px-3 py-3 border-2 rounded-xl text-center text-sm transition"
+              >
+                Sidebar Right
+              </button>
+            </div>
+
+            <!-- Accent Color Picker -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Accent Color</label>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <button
+                  v-for="color in accentSwatches"
+                  :key="color"
+                  type="button"
+                  @click="formData.accentColor = color"
+                  class="w-8 h-8 rounded-full border-2 transition flex items-center justify-center"
+                  :style="{ background: color, borderColor: formData.accentColor === color ? '#1e293b' : 'transparent' }"
+                >
+                  <q-icon v-if="formData.accentColor === color" name="mdi-check" color="white" size="16px" />
+                </button>
+                <input
+                  v-model="formData.accentColor"
+                  type="color"
+                  class="w-8 h-8 rounded-full border-2 border-slate-200 cursor-pointer bg-transparent p-0"
+                  title="Custom color"
+                />
+              </div>
             </div>
           </div>
 
@@ -460,7 +527,11 @@ const downloadPDF = async () => {
           </div>
 
           <!-- A4 Template Wrapper -->
-          <div class="bg-white shadow-xl border border-slate-200 overflow-hidden w-full" style="aspect-ratio: 1 / 1.414;" ref="previewRef">
+          <div
+            class="accent-scope bg-white shadow-xl border border-slate-200 overflow-hidden w-full"
+            :style="{ aspectRatio: '1 / 1.414', '--accent': formData.accentColor, '--accent-soft': accentSoft, '--accent-soft2': accentSoft2, '--accent-dark': accentDark }"
+            ref="previewRef"
+          >
 
             <!-- TEMPLATE 1: Modern Minimalist -->
             <div v-if="activeTemplate === 'modern'" class="h-full grid grid-cols-12 text-slate-800 bg-white" style="font-family: 'Inter', sans-serif;">
@@ -652,10 +723,10 @@ const downloadPDF = async () => {
             </div>
 
             <!-- TEMPLATE 3: Creative Accent -->
-            <div v-else class="h-full flex flex-col justify-between text-slate-800 bg-white" style="font-family: 'Outfit', sans-serif;">
+            <div v-else-if="activeTemplate === 'creative'" class="h-full flex flex-col justify-between text-slate-800 bg-white" style="font-family: 'Outfit', sans-serif;">
               <div>
                 <!-- Colorful top banner header -->
-                <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white p-6 relative">
+                <div class="text-white p-6 relative" :style="{ background: 'linear-gradient(to right, ' + formData.accentColor + ', ' + accentDark + ')' }">
                   <div class="flex justify-between items-start gap-4">
                     <div>
                       <h2 class="text-2xl font-black tracking-wide">{{ formData.fullname || 'Enter Full Name' }}</h2>
@@ -750,6 +821,166 @@ const downloadPDF = async () => {
               </div>
             </div>
 
+            <!-- TEMPLATE 4: Minimal Lines -->
+            <div v-else-if="activeTemplate === 'minimal'" class="h-full p-10 flex flex-col justify-between bg-white text-slate-800" style="font-family: 'Inter', sans-serif;">
+              <div>
+                <div class="flex items-center gap-4 mb-6 pb-4" :style="{ borderBottom: '2px solid ' + formData.accentColor }">
+                  <img v-if="formData.photo" :src="formData.photo" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                  <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900 leading-tight">{{ formData.fullname || 'Enter Full Name' }}</h2>
+                    <p class="text-xs font-semibold uppercase tracking-wider mt-1" :style="{ color: formData.accentColor }">{{ formData.title || 'Job Title' }}</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-slate-500 mb-6 font-mono">
+                  <span v-if="formData.email"><q-icon name="mdi-email" size="12px" /> {{ formData.email }}</span>
+                  <span v-if="formData.phone"><q-icon name="mdi-phone" size="12px" /> {{ formData.phone }}</span>
+                  <span v-if="formData.address"><q-icon name="mdi-map-marker" size="12px" /> {{ formData.address }}</span>
+                  <span v-if="formData.website"><q-icon name="mdi-web" size="12px" /> {{ formData.website }}</span>
+                </div>
+
+                <p v-if="formData.summary" class="text-xs text-slate-600 leading-relaxed mb-6">{{ formData.summary }}</p>
+
+                <div class="mb-6">
+                  <h3 class="text-[11px] font-bold uppercase tracking-widest mb-2" :style="{ color: formData.accentColor }">Experience</h3>
+                  <div class="space-y-3">
+                    <div v-for="(exp, idx) in formData.experience" :key="idx" class="text-xs">
+                      <div class="flex justify-between font-semibold text-slate-800">
+                        <span>{{ exp.position }} — {{ exp.company }}</span>
+                        <span class="text-[10px] text-slate-400 font-medium">{{ exp.startDate }} - {{ exp.endDate }}</span>
+                      </div>
+                      <p class="text-slate-500 text-[11px] mt-0.5 leading-relaxed whitespace-pre-wrap">{{ exp.description }}</p>
+                    </div>
+                    <p v-if="formData.experience.length === 0" class="text-xs text-slate-400 italic">No experience added</p>
+                  </div>
+                </div>
+
+                <div class="mb-6">
+                  <h3 class="text-[11px] font-bold uppercase tracking-widest mb-2" :style="{ color: formData.accentColor }">Education</h3>
+                  <div class="space-y-2">
+                    <div v-for="(edu, idx) in formData.education" :key="idx" class="text-xs flex justify-between">
+                      <span class="font-semibold text-slate-800">{{ edu.degree }}<span v-if="edu.school">, {{ edu.school }}</span></span>
+                      <span class="text-[10px] text-slate-400 font-medium">{{ edu.startDate }} - {{ edu.endDate }}</span>
+                    </div>
+                    <p v-if="formData.education.length === 0" class="text-xs text-slate-400 italic">No education added</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                  <div>
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest mb-2" :style="{ color: formData.accentColor }">Skills</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">{{ formData.skills || 'Not provided' }}</p>
+                  </div>
+                  <div>
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest mb-2" :style="{ color: formData.accentColor }">Languages</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line">{{ formData.languages || 'Not provided' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[10px] text-slate-400 text-center pt-4">
+                Minimal Lines Template
+              </div>
+            </div>
+
+            <!-- TEMPLATE 5: Sidebar Right -->
+            <div v-else class="h-full grid grid-cols-12 text-slate-800 bg-white" style="font-family: 'Inter', sans-serif;">
+              <!-- Main Content (left) -->
+              <div class="col-span-8 p-8 flex flex-col justify-between h-full">
+                <div>
+                  <h2 class="text-3xl font-extrabold text-slate-900 leading-tight">{{ formData.fullname || 'Enter Full Name' }}</h2>
+                  <p class="text-sm font-bold uppercase tracking-wider mt-1" :style="{ color: formData.accentColor }">{{ formData.title || 'Job Title' }}</p>
+
+                  <p v-if="formData.summary" class="text-xs text-slate-600 leading-relaxed italic mt-4 mb-6">{{ formData.summary }}</p>
+
+                  <div class="mb-6">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-1">Experience</h3>
+                    <div class="space-y-4">
+                      <div v-for="(exp, idx) in formData.experience" :key="idx" class="text-xs">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <h4 class="font-bold text-slate-800 text-sm">{{ exp.position }}</h4>
+                            <p class="text-slate-600 font-semibold">{{ exp.company }}</p>
+                          </div>
+                          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" :style="{ color: formData.accentColor, background: accentSoft }">{{ exp.startDate }} - {{ exp.endDate }}</span>
+                        </div>
+                        <p class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">{{ exp.description }}</p>
+                      </div>
+                      <p v-if="formData.experience.length === 0" class="text-xs text-slate-400 italic">No experience added</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-1">Education</h3>
+                    <div class="space-y-4">
+                      <div v-for="(edu, idx) in formData.education" :key="idx" class="text-xs">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <h4 class="font-bold text-slate-800 text-sm">{{ edu.degree }}</h4>
+                            <p class="text-slate-600 font-semibold">{{ edu.school }}</p>
+                          </div>
+                          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" :style="{ color: formData.accentColor, background: accentSoft }">{{ edu.startDate }} - {{ edu.endDate }}</span>
+                        </div>
+                        <p v-if="edu.description" class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">{{ edu.description }}</p>
+                      </div>
+                      <p v-if="formData.education.length === 0" class="text-xs text-slate-400 italic">No education added</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-[10px] text-slate-400 text-right">
+                  Generated as PDF
+                </div>
+              </div>
+
+              <!-- Sidebar (right) -->
+              <div class="col-span-4 p-6 flex flex-col justify-between h-full" :style="{ background: formData.accentColor }">
+                <div class="text-white">
+                  <div class="flex justify-center mb-6">
+                    <img v-if="formData.photo" :src="formData.photo" class="w-24 h-24 rounded-full object-cover border-2 border-white/40 shadow-md" />
+                    <div v-else class="w-24 h-24 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center text-white/60 text-xs">
+                      No Photo
+                    </div>
+                  </div>
+
+                  <h4 class="text-xs font-bold uppercase tracking-widest mb-3 pb-1 border-b border-white/20">Contact</h4>
+                  <ul class="space-y-3.5 text-xs text-white/90">
+                    <li v-if="formData.phone" class="flex items-start gap-2">
+                      <q-icon name="mdi-phone" class="mt-0.5" size="14px" />
+                      <span class="break-all">{{ formData.phone }}</span>
+                    </li>
+                    <li v-if="formData.email" class="flex items-start gap-2">
+                      <q-icon name="mdi-email" class="mt-0.5" size="14px" />
+                      <span class="break-all">{{ formData.email }}</span>
+                    </li>
+                    <li v-if="formData.address" class="flex items-start gap-2">
+                      <q-icon name="mdi-map-marker" class="mt-0.5" size="14px" />
+                      <span>{{ formData.address }}</span>
+                    </li>
+                    <li v-if="formData.website" class="flex items-start gap-2">
+                      <q-icon name="mdi-web" class="mt-0.5" size="14px" />
+                      <span class="break-all">{{ formData.website }}</span>
+                    </li>
+                  </ul>
+
+                  <h4 class="text-xs font-bold uppercase tracking-widest mt-8 mb-3 pb-1 border-b border-white/20">Skills</h4>
+                  <div class="flex flex-wrap gap-1.5">
+                    <span v-for="skill in formData.skills.split(',').map(s => s.trim()).filter(Boolean)" :key="skill" class="text-[10px] bg-white/15 text-white px-2 py-0.5 rounded font-mono">
+                      {{ skill }}
+                    </span>
+                    <span v-if="!formData.skills" class="text-xs text-white/50 italic">Not provided</span>
+                  </div>
+
+                  <h4 class="text-xs font-bold uppercase tracking-widest mt-8 mb-3 pb-1 border-b border-white/20">Languages</h4>
+                  <p class="text-xs text-white/90 leading-relaxed whitespace-pre-line">{{ formData.languages || 'Not provided' }}</p>
+                </div>
+
+                <div class="text-[10px] text-white/50 text-center border-t border-white/20 pt-3">
+                  Sidebar Right
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -775,5 +1006,38 @@ const downloadPDF = async () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Accent color theming for the live preview only */
+.accent-scope .text-indigo-400,
+.accent-scope .text-indigo-600,
+.accent-scope .text-indigo-700,
+.accent-scope .text-indigo-800,
+.accent-scope .text-indigo-900 {
+  color: var(--accent) !important;
+}
+
+.accent-scope .text-indigo-100,
+.accent-scope .text-indigo-200 {
+  color: var(--accent-soft2) !important;
+}
+
+.accent-scope .bg-indigo-600,
+.accent-scope .bg-indigo-700 {
+  background-color: var(--accent) !important;
+}
+
+.accent-scope .bg-indigo-50 {
+  background-color: var(--accent-soft) !important;
+}
+
+.accent-scope .bg-indigo-100 {
+  background-color: var(--accent-soft2) !important;
+}
+
+.accent-scope .border-indigo-100,
+.accent-scope .border-indigo-500,
+.accent-scope .border-indigo-600 {
+  border-color: var(--accent) !important;
 }
 </style>
