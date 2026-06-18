@@ -236,8 +236,17 @@ const generateLetter = () => {
 // PDF Export
 const downloadPDF = async () => {
   const savedScale = previewScale.value
+  const wasPreviewOpen = showPreviewMobile.value
   try {
     isExporting.value = true
+
+    // On mobile the preview is hidden (display:none) until opened — html2canvas
+    // can't capture a hidden element, so make sure it's visible first.
+    if (isCompactLayout.value && !wasPreviewOpen) {
+      showPreviewMobile.value = true
+      await nextTick()
+    }
+
     const html2Canvas = (await import('html2canvas')).default
     const { jsPDF } = await import('jspdf')
 
@@ -246,6 +255,11 @@ const downloadPDF = async () => {
 
     previewScale.value = 1
     await nextTick()
+    await nextTick()
+
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready
+    }
 
     const canvas = await html2Canvas(element, {
       scale: 2,
@@ -265,6 +279,9 @@ const downloadPDF = async () => {
     console.error(err)
     alert('An error occurred while generating the PDF')
   } finally {
+    if (isCompactLayout.value && !wasPreviewOpen) {
+      showPreviewMobile.value = false
+    }
     previewScale.value = savedScale
     isExporting.value = false
   }
