@@ -413,7 +413,6 @@ const mehnatStr = (dan: string, gacha: string): string => {
   font-weight: bold;
   text-align: center;
   text-transform: uppercase;
-  text-decoration: underline;
   letter-spacing: 1px;
   margin: 15px 0 15px 0;
   line-height: 1.25;
@@ -508,9 +507,9 @@ const mehnatStr = (dan: string, gacha: string): string => {
 .ob-rel-tbl td {
   border: 1px solid #000000;
   padding: 5px 4px;
-  text-align: left !important;
+  text-align: center !important;
   position: static !important;
-  vertical-align: top;
+  vertical-align: middle;
   word-break: break-word;
 }
 
