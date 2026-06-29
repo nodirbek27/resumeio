@@ -99,7 +99,6 @@ thead tr:first-child th {
 }
 
 td:last-child {
-  background-color: rgba(162, 220, 167, 0.3);
 }
 
 tr th {
