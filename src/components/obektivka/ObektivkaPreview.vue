@@ -371,6 +371,8 @@ const mehnatStr = (dan: string, gacha: string): string => {
   vertical-align: top;
   line-height: 1.25;
   word-break: break-word;
+  text-align: left !important;
+  position: static !important;
 }
 
 /* Oxirgi qatorda pastki border yo'q */
@@ -430,6 +432,8 @@ const mehnatStr = (dan: string, gacha: string): string => {
   padding: 1.5px 0;
   vertical-align: top;
   line-height: 1.25;
+  text-align: left !important;
+  position: static !important;
 }
 
 /* Sana ustuni */
@@ -505,7 +509,8 @@ const mehnatStr = (dan: string, gacha: string): string => {
 .ob-rel-tbl td {
   border: 1px solid #000000;
   padding: 5px 4px;
-  text-align: left;
+  text-align: left !important;
+  position: static !important;
   vertical-align: top;
   word-break: break-word;
 }
