@@ -10,6 +10,18 @@ const { t } = useI18n()
 
 const store = useCommonStore()
 
+const navMenus = menus.filter(m => m.meta?.title)
+
+const menuIconMap: Record<string, string> = {
+  resume: 'mdi-file-account-outline',
+  coverLetter: 'mdi-email-edit-outline',
+  obektivka: 'mdi-card-account-details-outline',
+}
+
+function getMenuIcon(name: string | symbol | null | undefined): string {
+  return menuIconMap[String(name ?? '')] ?? ''
+}
+
 /* =======================
   Responsive
 ======================= */
@@ -57,7 +69,7 @@ onUnmounted(() => {
         <div class="header-container">
 
           <!-- Mobile menu -->
-          <q-btn v-if="isMobile" flat dense round icon="mdi-menu" class="q-mr-sm" @click="drawer = !drawer" />
+          <q-btn v-if="isMobile" flat dense round icon="mdi-menu" color="dark" class="q-mr-sm" @click="drawer = !drawer" />
 
           <!-- Logo -->
           <RouterLink to="/" class="logo">
@@ -69,8 +81,9 @@ onUnmounted(() => {
 
           <!-- Desktop menu -->
           <div v-if="!isMobile" class="row items-center q-ml-md">
-            <RouterLink v-for="menu in menus" :key="menu.name" :to="{ name: menu.name as string }"
+            <RouterLink v-for="menu in navMenus" :key="menu.name" :to="{ name: menu.name as string }"
               class="menu-link q-mx-xs" active-class="active-menu">
+              <q-icon :name="getMenuIcon(menu.name)" size="15px" class="menu-link-icon" />
               {{ t(menu.meta?.title as string) }}
             </RouterLink>
           </div>
@@ -78,7 +91,7 @@ onUnmounted(() => {
           <q-space />
 
           <!-- Theme picker -->
-          <BaseBtn v-if="!isMobile" padding="sm" outline rounded icon="mdi-palette-outline">
+          <BaseBtn v-if="!isMobile" padding="sm" outline rounded icon="mdi-palette-outline" color="dark">
             <q-menu>
               <q-list style="min-width: 180px" class="q-pa-sm">
                 <q-item-label header class="text-caption">Choose color</q-item-label>
@@ -99,32 +112,49 @@ onUnmounted(() => {
     </q-header>
 
     <!-- ================= DRAWER (MOBILE) ================= -->
-    <q-drawer v-model="drawer" side="left" overlay bordered behavior="mobile">
-      <q-list padding>
+    <q-drawer v-model="drawer" side="left" overlay bordered behavior="mobile" :width="260">
+      <div class="drawer-inner">
 
-        <q-item-label header>Menu</q-item-label>
-
-        <q-item v-for="menu in menus" :key="menu.name" clickable v-ripple
-          @click="$router.push({ name: menu.name as string }); drawer = false">
-          <q-item-section>
-            {{ t(menu.meta?.title as string) }}
-          </q-item-section>
-        </q-item>
-
-        <q-separator class="q-my-md" />
-
-        <!-- Theme colors in mobile drawer -->
-        <q-item-label header class="text-caption">Color theme</q-item-label>
-        <div class="row justify-evenly q-pa-sm q-gutter-sm q-mb-sm">
-          <div class="color" style="background:#239f55" @click="changeTheme('#239f55')" />
-          <div class="color" style="background:#3f3a72" @click="changeTheme('#3f3a72')" />
-          <div class="color" style="background:#6a224f" @click="changeTheme('#6a224f')" />
-          <div class="color" style="background:#193779" @click="changeTheme('#193779')" />
-          <div class="color" style="background:#c0392b" @click="changeTheme('#c0392b')" />
-          <div class="color" style="background:#7f8c8d" @click="changeTheme('#7f8c8d')" />
+        <!-- Drawer header -->
+        <div class="drawer-header">
+          <div class="drawer-logo">
+            <span class="logo-icon">R</span>
+            ResumeIO
+          </div>
+          <q-btn flat dense round icon="mdi-close" size="sm" @click="drawer = false" />
         </div>
 
-      </q-list>
+        <!-- Nav items -->
+        <nav class="drawer-nav">
+          <RouterLink
+            v-for="menu in navMenus"
+            :key="menu.name"
+            :to="{ name: menu.name as string }"
+            class="drawer-link"
+            active-class="drawer-link--active"
+            @click="drawer = false"
+          >
+            <q-icon :name="getMenuIcon(menu.name)" size="20px" />
+            {{ t(menu.meta?.title as string) }}
+          </RouterLink>
+        </nav>
+
+        <div class="drawer-divider"></div>
+
+        <!-- Theme colors -->
+        <div class="drawer-section">
+          <p class="drawer-section-label">Color theme</p>
+          <div class="drawer-colors">
+            <div class="color" style="background:#239f55" @click="changeTheme('#239f55')" title="Green" />
+            <div class="color" style="background:#3f3a72" @click="changeTheme('#3f3a72')" title="Dark Blue" />
+            <div class="color" style="background:#6a224f" @click="changeTheme('#6a224f')" title="Maroon" />
+            <div class="color" style="background:#193779" @click="changeTheme('#193779')" title="Blue" />
+            <div class="color" style="background:#c0392b" @click="changeTheme('#c0392b')" title="Red" />
+            <div class="color" style="background:#7f8c8d" @click="changeTheme('#7f8c8d')" title="Gray" />
+          </div>
+        </div>
+
+      </div>
     </q-drawer>
 
     <!-- ================= PAGE ================= -->
@@ -234,11 +264,18 @@ onUnmounted(() => {
 .menu-link {
   text-decoration: none;
   color: #475569;
-  padding: 6px 14px;
+  padding: 6px 13px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.menu-link-icon {
+  opacity: 0.7;
 }
 
 .menu-link:hover {
@@ -250,6 +287,91 @@ onUnmounted(() => {
   background: var(--q-primary);
   color: white !important;
   font-weight: 600;
+}
+
+.active-menu .menu-link-icon {
+  opacity: 1;
+}
+
+/* DRAWER */
+.drawer-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.drawer-logo {
+  font-weight: 800;
+  font-size: 16px;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 10px;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.drawer-link:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.drawer-link--active {
+  background: rgba(var(--q-primary-rgb, 35,159,85), 0.1);
+  color: var(--q-primary) !important;
+  font-weight: 600;
+}
+
+.drawer-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 16px;
+}
+
+.drawer-section {
+  padding: 12px 16px;
+}
+
+.drawer-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+}
+
+.drawer-colors {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* FOOTER */
