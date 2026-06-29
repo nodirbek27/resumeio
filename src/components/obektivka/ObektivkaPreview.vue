@@ -366,7 +366,6 @@ const mehnatStr = (dan: string, gacha: string): string => {
 
 .ob-info-tbl td {
   border: none;
-  border-bottom: 0.5pt solid #bbbbbb;
   padding: 3px 2px 5px 0;
   vertical-align: top;
   line-height: 1.25;

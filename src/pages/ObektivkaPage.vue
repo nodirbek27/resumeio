@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import ObektivkaForm from '@/components/obektivka/ObektivkaForm.vue'
 import ObektivkaPreview from '@/components/obektivka/ObektivkaPreview.vue'
@@ -36,18 +36,18 @@ const defaultFormData: ObektivkaFormData = {
   qarindoshlar: [],
 }
 
-const formData = reactive<ObektivkaFormData>({ ...defaultFormData })
+const formData = ref<ObektivkaFormData>({ ...defaultFormData })
 const previewRef = ref<HTMLDivElement | null>(null)
 
 onMounted(() => {
   const savedData = obektivkaStorage.load()
   if (savedData) {
-    Object.assign(formData, savedData)
+    formData.value = savedData
   }
 })
 
 watch(
-  () => formData,
+  formData,
   (newData) => {
     obektivkaStorage.save(newData)
   },
@@ -56,7 +56,7 @@ watch(
 
 const clearAllData = () => {
   if (confirm("Haqiqatan ham barcha ma'lumotlarni o'chirmoqchisiz?")) {
-    Object.assign(formData, { ...defaultFormData, mehnatFaoliyatiRoyxat: [], qarindoshlar: [] })
+    formData.value = { ...defaultFormData, mehnatFaoliyatiRoyxat: [], qarindoshlar: [] }
     obektivkaStorage.clear()
   }
 }
