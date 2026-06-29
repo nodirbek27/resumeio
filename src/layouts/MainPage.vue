@@ -134,6 +134,30 @@ onUnmounted(() => {
       </q-page>
     </q-page-container>
 
+    <!-- ================= FOOTER ================= -->
+    <q-footer class="app-footer">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <RouterLink to="/" class="footer-logo">
+            <span class="footer-logo-icon">R</span>
+            ResumeIO
+          </RouterLink>
+          <p class="footer-tagline">
+            <q-icon name="mdi-shield-lock-outline" size="13px" />
+            Your data never leaves your device
+          </p>
+        </div>
+
+        <nav class="footer-links">
+          <RouterLink v-for="menu in menus" :key="menu.name" :to="{ name: menu.name as string }" class="footer-link">
+            {{ t(menu.meta?.title as string) }}
+          </RouterLink>
+        </nav>
+
+        <p class="footer-copy">&copy; {{ new Date().getFullYear() }} ResumeIO &middot; Free forever</p>
+      </div>
+    </q-footer>
+
   </q-layout>
 </template>
 
@@ -226,6 +250,104 @@ onUnmounted(() => {
   background: var(--q-primary);
   color: white !important;
   font-weight: 600;
+}
+
+/* FOOTER */
+.app-footer {
+  background: #fff !important;
+  border-top: 1px solid #e8edf3;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.footer-logo {
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 15px;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-logo-icon {
+  width: 22px;
+  height: 22px;
+  background: var(--q-primary);
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.footer-tagline {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-link {
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  padding: 5px 10px;
+  border-radius: 7px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.footer-link:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 18px 16px;
+    gap: 12px;
+  }
+
+  .footer-left { align-items: center; }
 }
 
 /* THEME COLORS */
