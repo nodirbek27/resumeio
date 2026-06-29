@@ -917,17 +917,15 @@ const downloadPDF = async () => {
                     >
                       Skills
                     </h4>
-                    <div class="flex flex-wrap gap-1.5">
+                    <div class="flex flex-wrap gap-x-3 gap-y-1.5">
                       <span
                         v-for="skill in formData.skills
                           .split(',')
                           .map((s) => s.trim())
                           .filter(Boolean)"
                         :key="skill"
-                        class="text-[10px] bg-slate-800 text-slate-200 px-2 py-0.5 rounded font-mono"
-                      >
-                        {{ skill }}
-                      </span>
+                        class="text-[10px] text-slate-300 font-mono"
+                      >&#8226; {{ skill }}</span>
                       <span v-if="!formData.skills" class="text-xs text-slate-500 italic"
                         >Not provided</span
                       >
@@ -1350,17 +1348,15 @@ const downloadPDF = async () => {
                         >
                           Skills
                         </h3>
-                        <div class="flex flex-wrap gap-1.5">
+                        <div class="flex flex-wrap gap-x-3 gap-y-1.5">
                           <span
                             v-for="skill in formData.skills
                               .split(',')
                               .map((s) => s.trim())
                               .filter(Boolean)"
                             :key="skill"
-                            class="text-[10px] bg-slate-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold"
-                          >
-                            {{ skill }}
-                          </span>
+                            class="text-[10px] text-indigo-700 font-bold"
+                          >&#8226; {{ skill }}</span>
                           <span v-if="!formData.skills" class="text-xs text-slate-400 italic"
                             >Not provided</span
                           >
@@ -1675,17 +1671,15 @@ const downloadPDF = async () => {
                     >
                       Skills
                     </h4>
-                    <div class="flex flex-wrap gap-1.5">
+                    <div class="flex flex-wrap gap-x-3 gap-y-1.5">
                       <span
                         v-for="skill in formData.skills
                           .split(',')
                           .map((s) => s.trim())
                           .filter(Boolean)"
                         :key="skill"
-                        class="text-[10px] bg-white/15 text-white px-2 py-0.5 rounded font-mono"
-                      >
-                        {{ skill }}
-                      </span>
+                        class="text-[10px] text-white font-mono"
+                      >&#8226; {{ skill }}</span>
                       <span v-if="!formData.skills" class="text-xs text-white/50 italic"
                         >Not provided</span
                       >

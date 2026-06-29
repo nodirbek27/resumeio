@@ -554,7 +554,7 @@ const downloadPDF = async () => {
                   <p class="text-xs font-bold text-slate-800 mb-4">{{ formData.salutation }}</p>
 
                   <!-- Letter Body -->
-                  <div class="text-xs text-slate-600 leading-relaxed space-y-4 whitespace-pre-wrap text-justify">
+                  <div class="text-xs text-slate-600 leading-relaxed space-y-4 whitespace-pre-wrap">
                     {{ formData.bodyText || 'Write your letter text here...' }}
                   </div>
 
@@ -606,7 +606,7 @@ const downloadPDF = async () => {
                 <p class="text-xs font-bold mb-4 font-sans text-slate-900">{{ formData.salutation }}</p>
 
                 <!-- Letter Body -->
-                <div class="text-xs text-slate-700 leading-relaxed text-justify whitespace-pre-wrap space-y-4">
+                <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap space-y-4">
                   {{ formData.bodyText || 'Enter your letter text...' }}
                 </div>
 
@@ -661,7 +661,7 @@ const downloadPDF = async () => {
                   <p class="text-xs font-bold text-slate-800 mb-3">{{ formData.salutation }}</p>
 
                   <!-- Letter Body -->
-                  <div class="text-xs text-slate-600 leading-relaxed text-justify whitespace-pre-wrap">
+                  <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
                     {{ formData.bodyText || 'Write your letter text here...' }}
                   </div>
 
