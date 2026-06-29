@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import ObektivkaForm from '@/components/obektivka/ObektivkaForm.vue'
 import ObektivkaPreview from '@/components/obektivka/ObektivkaPreview.vue'
@@ -39,11 +39,37 @@ const defaultFormData: ObektivkaFormData = {
 const formData = ref<ObektivkaFormData>({ ...defaultFormData })
 const previewRef = ref<HTMLDivElement | null>(null)
 
+// Mobile preview scale
+const A4_PX = (210 / 25.4) * 96 // ~794px
+const mobileScale = ref(1)
+
+const updateScale = () => {
+  mobileScale.value = Math.min(1, (window.innerWidth - 32) / A4_PX)
+}
+
+const mobileOuterStyle = computed(() => {
+  const a4H = (297 / 25.4) * 96 // ~1122px per page
+  return { height: `${(a4H * 2 + 24) * mobileScale.value}px`, position: 'relative' as const }
+})
+
+const mobileInnerStyle = computed(() => ({
+  transform: `scale(${mobileScale.value})`,
+  transformOrigin: 'top left',
+  width: '210mm',
+  position: 'absolute' as const,
+}))
+
 onMounted(() => {
   const savedData = obektivkaStorage.load()
   if (savedData) {
     formData.value = savedData
   }
+  updateScale()
+  window.addEventListener('resize', updateScale)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScale)
 })
 
 watch(
@@ -119,8 +145,12 @@ const clearAllData = () => {
           <q-space />
           <q-btn dense flat icon="mdi-close" v-close-popup />
         </q-bar>
-        <q-card-section class="q-pa-md overflow-auto" style="max-height: calc(100vh - 50px)">
-          <ObektivkaPreview v-model="formData" />
+        <q-card-section class="q-pa-sm" style="overflow-y: auto; max-height: calc(100vh - 50px)">
+          <div :style="mobileOuterStyle">
+            <div :style="mobileInnerStyle">
+              <ObektivkaPreview v-model="formData" />
+            </div>
+          </div>
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -227,7 +257,12 @@ const clearAllData = () => {
   }
 
   .preview-col {
-    display: none;
+    position: fixed;
+    left: -9999px;
+    top: 0;
+    width: 210mm;
+    pointer-events: none;
+    z-index: -1;
   }
 
   .obektivka-page-wrap {

@@ -147,7 +147,7 @@ const mehnatStr = (dan: string, gacha: string): string => {
           <!-- 7 — to'liq kenglik -->
           <tr>
             <td colspan="2">
-              <b class="fl">Davlat mukofotlari bilan taqdirlanganmi (qaysilar):</b><br />
+              <b class="fl">Davlat mukofotlari bilan taqdirlanganmi (qanaqa):</b><br />
               <span class="fv">{{ modelValue.davlatMukofotlari || yoq }}</span>
             </td>
           </tr>
@@ -155,8 +155,8 @@ const mehnatStr = (dan: string, gacha: string): string => {
           <tr class="tr-last">
             <td colspan="2">
               <b class="fl"
-                >Xalq deputatlari, respublika, viloyat, shahar va tuman Kengashlari
-                a'zosimi yoki yo'qmi (to'liq ko'rsatilishi lozim):</b
+                >Xalq deputatlari, respublika, viloyat, shahar va tuman Kengashi deputatimi
+                yoki boshqa saylanadigan organlarning a'zosimi (to'liq ko'rsatilishi lozim):</b
               ><br />
               <span class="fv">{{ modelValue.xalqDeputatlari || yoq }}</span>
             </td>
@@ -356,6 +356,18 @@ const mehnatStr = (dan: string, gacha: string): string => {
 /* ══════════════════════════════════════════════════
    SHAXSIY MA'LUMOTLAR JADVALI (chegarasiz)
 ══════════════════════════════════════════════════ */
+.ob-info-tbl,
+.ob-info-tbl tbody,
+.ob-info-tbl tr,
+.ob-info-tbl td {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  scroll-margin-top: 0 !important;
+  transform: none !important;
+}
+
 .ob-info-tbl {
   width: 100%;
   border-collapse: collapse;
@@ -367,11 +379,10 @@ const mehnatStr = (dan: string, gacha: string): string => {
 .ob-info-tbl td {
   border: none;
   padding: 3px 2px 5px 0;
-  vertical-align: top;
+  vertical-align: top !important;
   line-height: 1.25;
   word-break: break-word;
   text-align: left !important;
-  position: static !important;
 }
 
 /* Oxirgi qatorda pastki border yo'q */
@@ -418,6 +429,18 @@ const mehnatStr = (dan: string, gacha: string): string => {
   line-height: 1.25;
 }
 
+.ob-work-tbl,
+.ob-work-tbl tbody,
+.ob-work-tbl tr,
+.ob-work-tbl td {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  scroll-margin-top: 0 !important;
+  transform: none !important;
+}
+
 .ob-work-tbl {
   width: 100%;
   border-collapse: collapse;
@@ -428,10 +451,9 @@ const mehnatStr = (dan: string, gacha: string): string => {
 .ob-work-tbl td {
   border: none;
   padding: 1.5px 0;
-  vertical-align: top;
+  vertical-align: top !important;
   line-height: 1.25;
   text-align: left !important;
-  position: static !important;
 }
 
 /* Sana ustuni */
@@ -484,6 +506,24 @@ const mehnatStr = (dan: string, gacha: string): string => {
 /* ══════════════════════════════════════════════════
    QARINDOSHLAR JADVALI (ko'rinadigan border)
 ══════════════════════════════════════════════════ */
+/* BaseTable.vue global stillarini to'liq bekor qilish */
+.ob-rel-tbl,
+.ob-rel-tbl thead,
+.ob-rel-tbl tbody,
+.ob-rel-tbl tr,
+.ob-rel-tbl th,
+.ob-rel-tbl td {
+  position: static !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  scroll-margin-top: 0 !important;
+  transform: none !important;
+  background: #ffffff !important;
+}
+
 .ob-rel-tbl {
   width: 100%;
   border-collapse: collapse;
@@ -493,31 +533,27 @@ const mehnatStr = (dan: string, gacha: string): string => {
 }
 
 .ob-rel-tbl th {
-  border: 1px solid #000000;
-  padding: 5px 4px;
-  text-align: center;
+  border: 1px solid #000000 !important;
+  padding: 6px 4px;
+  text-align: center !important;
   font-weight: bold;
-  vertical-align: middle;
+  vertical-align: top !important;
   font-size: 10pt;
-  background: #ffffff;
   line-height: 1.3;
   word-break: break-word;
 }
 
 .ob-rel-tbl td {
-  border: 1px solid #000000;
-  padding: 5px 4px;
+  border: 1px solid #000000 !important;
+  padding: 6px 4px;
   text-align: center !important;
-  position: static !important;
-  vertical-align: middle;
+  vertical-align: top !important;
   word-break: break-word;
 }
 
-/* Qarindoshligi ustuni: bold, markazlashtirilgan */
+/* Qarindoshligi ustuni: bold */
 .td-rel-name {
   font-weight: bold;
-  text-align: center;
-  vertical-align: middle;
 }
 
 .tr-empty td {

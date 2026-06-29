@@ -70,6 +70,9 @@ const removeMehnat = (index: number) => {
 }
 
 const photoLabel = computed(() => props.modelValue.rasm ? 'Rasm tanlandi ✓' : 'Rasm tanlang (3x4)')
+
+const currentYear = new Date().getFullYear()
+const years = Array.from({ length: currentYear - 1959 }, (_, i) => currentYear - i)
 </script>
 
 <template>
@@ -264,7 +267,7 @@ const photoLabel = computed(() => props.modelValue.rasm ? 'Rasm tanlandi ✓' : 
           Qo'shish
         </button>
       </div>
-      <p class="hint mb-2">Yangi ish joyini qo'shing. "Gacha" maydoniga <strong>h.v.</strong> (hozirgi vaqt) yozing.</p>
+      <p class="hint mb-2">Yangi ish joyini qo'shing. "Gacha"da hozirgi vaqt uchun <strong>h.v.</strong> ni tanlang.</p>
 
       <div v-if="modelValue.mehnatFaoliyatiRoyxat.length === 0" class="empty-state">
         Mehnat faoliyati qo'shilmagan. "Qo'shish" tugmasini bosing.
@@ -282,15 +285,22 @@ const photoLabel = computed(() => props.modelValue.rasm ? 'Rasm tanlandi ✓' : 
         <div class="grid-2 mt-1">
           <div class="field">
             <label class="label">Dan (boshlanish)</label>
-            <input :value="item.dan"
-              @input="updateMehnat(index, 'dan', ($event.target as HTMLInputElement).value)"
-              type="text" placeholder="2010 yil mart" class="inp" />
+            <select :value="item.dan"
+              @change="updateMehnat(index, 'dan', ($event.target as HTMLSelectElement).value)"
+              class="inp">
+              <option value="">— yilni tanlang —</option>
+              <option v-for="y in years" :key="y" :value="String(y)">{{ y }}</option>
+            </select>
           </div>
           <div class="field">
             <label class="label">Gacha (tugash)</label>
-            <input :value="item.gacha"
-              @input="updateMehnat(index, 'gacha', ($event.target as HTMLInputElement).value)"
-              type="text" placeholder="2015 yil iyun yoki h.v." class="inp" />
+            <select :value="item.gacha"
+              @change="updateMehnat(index, 'gacha', ($event.target as HTMLSelectElement).value)"
+              class="inp">
+              <option value="">— yilni tanlang —</option>
+              <option value="h.v.">h.v. (hozirgi vaqtgacha)</option>
+              <option v-for="y in years" :key="y" :value="String(y)">{{ y }}</option>
+            </select>
           </div>
         </div>
         <div class="field mt-1">
@@ -338,8 +348,8 @@ const photoLabel = computed(() => props.modelValue.rasm ? 'Rasm tanlandi ✓' : 
               <option value="Otasi">Otasi</option>
               <option value="Onasi">Onasi</option>
               <option value="Turmush o'rtog'i">Turmush o'rtog'i</option>
-              <option value="Turmush o'rtog'ining otasi">Turmush o'rtog'ining otasi</option>
-              <option value="Turmush o'rtog'ining onasi">Turmush o'rtog'ining onasi</option>
+              <option value="Qaynotasi">Qaynotasi</option>
+              <option value="Qaynonasi">Qaynonasi</option>
               <option value="Akasi">Akasi</option>
               <option value="Ukasi">Ukasi</option>
               <option value="Opasi">Opasi</option>

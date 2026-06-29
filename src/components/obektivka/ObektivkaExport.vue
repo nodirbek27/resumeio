@@ -36,10 +36,18 @@ const downloadPDF = async () => {
     let isFirstPage = true
 
     for (const page of Array.from(pages)) {
-      const canvas = await html2Canvas(page as HTMLElement, {
-        scale: 2,
+      const el = page as HTMLElement
+      const rect = el.getBoundingClientRect()
+      const canvas = await html2Canvas(el, {
+        scale: window.devicePixelRatio > 1 ? 1.5 : 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
+        backgroundColor: '#ffffff',
+        scrollX: -rect.left,
+        scrollY: -rect.top,
+        windowWidth: el.scrollWidth,
+        windowHeight: el.scrollHeight,
       })
 
       const imgData = canvas.toDataURL('image/png')
