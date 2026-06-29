@@ -974,7 +974,7 @@ const downloadPDF = async () => {
                     <!-- Experience Section -->
                     <div class="mb-6">
                       <h3
-                        class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-1"
+                        class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-2"
                       >
                         Experience
                       </h3>
@@ -1007,7 +1007,7 @@ const downloadPDF = async () => {
                     <!-- Education Section -->
                     <div>
                       <h3
-                        class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-1"
+                        class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-200 pb-2"
                       >
                         Education
                       </h3>
@@ -1084,7 +1084,7 @@ const downloadPDF = async () => {
                   <!-- Professional Summary -->
                   <div v-if="formData.summary" class="mb-6">
                     <h3
-                      class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-1"
+                      class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-2"
                     >
                       Summary
                     </h3>
@@ -1096,7 +1096,7 @@ const downloadPDF = async () => {
                   <!-- Experience Section -->
                   <div class="mb-6">
                     <h3
-                      class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3 font-sans border-b border-slate-200 pb-1"
+                      class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3 font-sans border-b border-slate-200 pb-2"
                     >
                       Experience
                     </h3>
@@ -1132,7 +1132,7 @@ const downloadPDF = async () => {
                   <!-- Education Section -->
                   <div class="mb-6">
                     <h3
-                      class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3 font-sans border-b border-slate-200 pb-1"
+                      class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3 font-sans border-b border-slate-200 pb-2"
                     >
                       Education
                     </h3>
@@ -1170,7 +1170,7 @@ const downloadPDF = async () => {
                   <div class="grid grid-cols-2 gap-6">
                     <div>
                       <h3
-                        class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-1"
+                        class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-2"
                       >
                         Skills
                       </h3>
@@ -1180,7 +1180,7 @@ const downloadPDF = async () => {
                     </div>
                     <div>
                       <h3
-                        class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-1"
+                        class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 font-sans border-b border-slate-200 pb-2"
                       >
                         Languages
                       </h3>
