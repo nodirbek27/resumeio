@@ -179,7 +179,7 @@ onUnmounted(() => {
         </div>
 
         <nav class="footer-links">
-          <RouterLink v-for="menu in menus" :key="menu.name" :to="{ name: menu.name as string }" class="footer-link">
+          <RouterLink v-for="menu in navMenus" :key="menu.name" :to="{ name: menu.name as string }" class="footer-link">
             {{ t(menu.meta?.title as string) }}
           </RouterLink>
         </nav>
