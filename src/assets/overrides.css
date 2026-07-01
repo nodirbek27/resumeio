@@ -1,0 +1,10 @@
+/* Quasar'ning Material Design heading sizlarini bekor qilish.
+   Bu fayl main.ts'da Quasar CSS'dan KEYIN import qilinadi — shu sababli kaskadda ustun turadi.
+   Tailwind utility classlar (text-xs, text-2xl, font-bold va h.k.) class selektor (0,1,0)
+   bo'lgani uchun element selektor (0,0,1) dan kuchli — heading'larni to'g'ri o'lchamda ko'rsatadi. */
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.2;
+  margin: 0;
+}

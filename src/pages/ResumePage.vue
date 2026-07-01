@@ -286,7 +286,9 @@ const downloadPDF = async () => {
     const canvas = await html2Canvas(element, {
       scale: 2,
       useCORS: true,
+      allowTaint: true,
       logging: false,
+      backgroundColor: '#ffffff',
     })
 
     const imgData = canvas.toDataURL('image/png')
