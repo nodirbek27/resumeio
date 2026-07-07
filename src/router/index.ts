@@ -14,9 +14,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/HomeView.vue'),
         meta: {
           title: '',
-          seoTitle: 'ResumeIO — CV va Obektivka yasash | Bepul',
+          seoTitle: 'ResumeIO — Free Online Resume, CV & Cover Letter Builder',
           description:
-            "O'zbekistonda rasmiy obektivka (ma'lumotnoma) va CV (rezyume) yaratish. Word va PDF formatida yuklab oling. Bepul, ro'yxatdan o'tish shart emas.",
+            'Build a professional resume, CV, and cover letter online for free. Choose from multiple templates, preview in real time, and download as PDF or Word instantly.',
           canonical: `${SITE_URL}/`,
         },
       },
@@ -26,9 +26,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/ResumePage.vue'),
         meta: {
           title: 'menu.resume',
-          seoTitle: "CV (Rezyume) Yasash — ResumeIO | Bepul va Onlayn",
+          seoTitle: 'Resume Builder — Create a Professional CV Online | ResumeIO',
           description:
-            "Professional CV (rezyume) yarating. Bir nechta zamonaviy shablon, real-time preview. PDF va Word formatida yuklab oling. Bepul.",
+            'Build a professional resume (CV) online with modern templates and a real-time preview. Download as PDF or Word for free — no sign-up required.',
           canonical: `${SITE_URL}/resume`,
         },
       },
@@ -38,9 +38,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/CoverLetterPage.vue'),
         meta: {
           title: 'menu.coverLetter',
-          seoTitle: "Cover Letter (Motivatsion Xat) Yasash — ResumeIO",
+          seoTitle: 'Cover Letter Builder — Write a Professional Cover Letter Online | ResumeIO',
           description:
-            "Professional cover letter (motivatsion xat) yarating. PDF va Word formatida yuklab oling. Bepul onlayn vosita.",
+            'Create a professional cover letter online in minutes with modern templates. Download as PDF or Word for free — no sign-up required.',
           canonical: `${SITE_URL}/cover-letter`,
         },
       },
@@ -50,9 +50,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/ObektivkaPage.vue'),
         meta: {
           title: 'menu.obektivka',
-          seoTitle: "Obektivka (Ma'lumotnoma) Yasash — ResumeIO | Rasmiy Shakl",
+          seoTitle: 'Obektivka (Official Reference Letter) Maker — ResumeIO',
           description:
-            "O'zbekiston davlat va xususiy tashkilotlari uchun rasmiy obektivka (ma'lumotnoma) yaratish. A4 format, rasmiy standart. Word va PDF yuklab oling. Bepul.",
+            'Create an official Obektivka reference letter for Uzbekistan government and private institutions. A4 format, official standard. Download as Word or PDF for free.',
           canonical: `${SITE_URL}/obektivka`,
         },
       },

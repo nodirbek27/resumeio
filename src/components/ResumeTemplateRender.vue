@@ -839,17 +839,19 @@ const accentDark = computed(() => shade(props.data.accentColor, -0.35))
           <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 text-center">
             Skills
           </h3>
-          <div class="flex flex-wrap justify-center gap-1.5">
-            <span
-              v-for="skill in data.skills
+          <div class="flex flex-wrap justify-center items-center gap-x-1.5 gap-y-1">
+            <template
+              v-for="(skill, idx) in data.skills
                 .split(',')
                 .map((s) => s.trim())
                 .filter(Boolean)"
               :key="skill"
-              class="text-[10px] font-semibold px-2 py-0.5 rounded-full border"
-              :style="{ borderColor: data.accentColor, color: data.accentColor }"
-              >{{ skill }}</span
             >
+              <span v-if="idx > 0" class="text-slate-300 text-[10px]">&#8226;</span>
+              <span class="text-[10px] font-semibold" :style="{ color: data.accentColor }">{{
+                skill
+              }}</span>
+            </template>
             <span v-if="!data.skills" class="text-xs text-slate-400 italic">Not provided</span>
           </div>
         </div>
