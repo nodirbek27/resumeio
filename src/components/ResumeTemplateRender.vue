@@ -579,7 +579,11 @@ const accentDark = computed(() => shade(props.data.accentColor, -0.35))
   </div>
 
   <!-- TEMPLATE 5: Sidebar Right -->
-  <div v-else class="h-full grid grid-cols-12 text-slate-800 bg-white" style="font-family: 'Inter', sans-serif">
+  <div
+    v-else-if="template === 'sidebar-right'"
+    class="h-full grid grid-cols-12 text-slate-800 bg-white"
+    style="font-family: 'Inter', sans-serif"
+  >
     <!-- Main Content (left) -->
     <div class="col-span-8 p-8 flex flex-col justify-between h-full">
       <div>
@@ -733,6 +737,522 @@ const accentDark = computed(() => shade(props.data.accentColor, -0.35))
         Sidebar Right
       </div>
     </div>
+  </div>
+
+  <!-- TEMPLATE 6: Elegant Timeline -->
+  <div
+    v-else-if="template === 'timeline'"
+    class="h-full p-10 flex flex-col justify-between bg-white text-slate-800"
+    style="font-family: 'Inter', sans-serif"
+  >
+    <div>
+      <!-- Centered header -->
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+          {{ data.fullname || 'Enter Full Name' }}
+        </h2>
+        <p
+          class="text-xs font-bold uppercase tracking-[0.2em] mt-2"
+          :style="{ color: data.accentColor }"
+        >
+          {{ data.title || 'Job Title' }}
+        </p>
+        <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-slate-500 mt-4">
+          <span v-if="data.email"><q-icon name="mdi-email" size="12px" /> {{ data.email }}</span>
+          <span v-if="data.phone"><q-icon name="mdi-phone" size="12px" /> {{ data.phone }}</span>
+          <span v-if="data.address"
+            ><q-icon name="mdi-map-marker" size="12px" /> {{ data.address }}</span
+          >
+          <span v-if="data.website"><q-icon name="mdi-web" size="12px" /> {{ data.website }}</span>
+        </div>
+      </div>
+
+      <p
+        v-if="data.summary"
+        class="text-xs text-slate-600 leading-relaxed text-center italic mb-8 px-6"
+      >
+        {{ data.summary }}
+      </p>
+
+      <!-- Experience timeline -->
+      <div class="mb-8">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-4 text-center">
+          Experience
+        </h3>
+        <div class="relative pl-6 border-l-2 border-slate-100 space-y-6">
+          <div v-for="(exp, idx) in data.experience" :key="idx" class="relative text-xs">
+            <span
+              class="absolute -left-[30px] top-0.5 w-3 h-3 rounded-full border-2 border-white"
+              :style="{ background: data.accentColor }"
+            ></span>
+            <div class="flex justify-between items-baseline">
+              <h4 class="font-bold text-slate-900 text-sm">{{ exp.position }}</h4>
+              <span class="text-[10px] font-semibold text-slate-400"
+                >{{ exp.startDate }} - {{ exp.endDate }}</span
+              >
+            </div>
+            <p class="text-slate-600 font-semibold text-[11px]">{{ exp.company }}</p>
+            <p class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">
+              {{ exp.description }}
+            </p>
+          </div>
+          <p v-if="data.experience.length === 0" class="text-xs text-slate-400 italic">
+            No experience added
+          </p>
+        </div>
+      </div>
+
+      <!-- Education timeline -->
+      <div class="mb-8">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-4 text-center">
+          Education
+        </h3>
+        <div class="relative pl-6 border-l-2 border-slate-100 space-y-6">
+          <div v-for="(edu, idx) in data.education" :key="idx" class="relative text-xs">
+            <span
+              class="absolute -left-[30px] top-0.5 w-3 h-3 rounded-full border-2 border-white"
+              :style="{ background: data.accentColor }"
+            ></span>
+            <div class="flex justify-between items-baseline">
+              <h4 class="font-bold text-slate-900 text-sm">{{ edu.degree }}</h4>
+              <span class="text-[10px] font-semibold text-slate-400"
+                >{{ edu.startDate }} - {{ edu.endDate }}</span
+              >
+            </div>
+            <p class="text-slate-600 font-semibold text-[11px]">{{ edu.school }}</p>
+            <p
+              v-if="edu.description"
+              class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap"
+            >
+              {{ edu.description }}
+            </p>
+          </div>
+          <p v-if="data.education.length === 0" class="text-xs text-slate-400 italic">
+            No education added
+          </p>
+        </div>
+      </div>
+
+      <!-- Skills & Languages -->
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 text-center">
+            Skills
+          </h3>
+          <div class="flex flex-wrap justify-center gap-1.5">
+            <span
+              v-for="skill in data.skills
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)"
+              :key="skill"
+              class="text-[10px] font-semibold px-2 py-0.5 rounded-full border"
+              :style="{ borderColor: data.accentColor, color: data.accentColor }"
+              >{{ skill }}</span
+            >
+            <span v-if="!data.skills" class="text-xs text-slate-400 italic">Not provided</span>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 text-center">
+            Languages
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed text-center whitespace-pre-line">
+            {{ data.languages || 'Not provided' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-[10px] text-slate-400 text-center pt-6">Elegant Timeline Template</div>
+  </div>
+
+  <!-- TEMPLATE 7: Bold Header -->
+  <div
+    v-else-if="template === 'bold-header'"
+    class="h-full flex flex-col justify-between bg-white text-slate-800"
+    style="font-family: 'Outfit', sans-serif"
+  >
+    <div>
+      <!-- Solid bold header banner -->
+      <div class="p-8 text-white" :style="{ background: data.accentColor }">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-3xl font-black uppercase tracking-wide leading-none">
+              {{ data.fullname || 'Enter Full Name' }}
+            </h2>
+            <p class="text-xs font-bold uppercase tracking-[0.25em] text-white/80 mt-2">
+              {{ data.title || 'Job Title' }}
+            </p>
+          </div>
+          <img
+            v-if="data.photo"
+            :src="data.photo"
+            class="w-20 h-20 rounded-2xl object-cover border-2 border-white/50 shadow-md flex-shrink-0"
+          />
+        </div>
+        <div class="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-white/90 mt-5 font-mono">
+          <span v-if="data.email"><q-icon name="mdi-email" size="13px" /> {{ data.email }}</span>
+          <span v-if="data.phone"><q-icon name="mdi-phone" size="13px" /> {{ data.phone }}</span>
+          <span v-if="data.address"
+            ><q-icon name="mdi-map-marker" size="13px" /> {{ data.address }}</span
+          >
+          <span v-if="data.website"><q-icon name="mdi-web" size="13px" /> {{ data.website }}</span>
+        </div>
+      </div>
+
+      <!-- Body: sidebar + main -->
+      <div class="grid grid-cols-12 gap-6 p-8">
+        <!-- Sidebar (left) -->
+        <div class="col-span-4 space-y-6">
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-sm" :style="{ background: data.accentColor }"></span>
+              Skills
+            </h3>
+            <div class="flex flex-col gap-1.5">
+              <span
+                v-for="skill in data.skills
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)"
+                :key="skill"
+                class="text-[11px] font-semibold text-slate-700"
+                >{{ skill }}</span
+              >
+              <span v-if="!data.skills" class="text-xs text-slate-400 italic">Not provided</span>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-sm" :style="{ background: data.accentColor }"></span>
+              Languages
+            </h3>
+            <p class="text-[11px] text-slate-700 leading-relaxed whitespace-pre-line">
+              {{ data.languages || 'Not provided' }}
+            </p>
+          </div>
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-sm" :style="{ background: data.accentColor }"></span>
+              Education
+            </h3>
+            <div class="space-y-3">
+              <div v-for="(edu, idx) in data.education" :key="idx" class="text-[11px]">
+                <strong class="text-slate-900 block">{{ edu.degree }}</strong>
+                <span class="text-slate-500 block">{{ edu.school }}</span>
+                <span class="text-slate-400 block font-mono text-[10px]"
+                  >{{ edu.startDate }} - {{ edu.endDate }}</span
+                >
+              </div>
+              <p v-if="data.education.length === 0" class="text-xs text-slate-400 italic">
+                No education added
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main (right) -->
+        <div class="col-span-8 space-y-5">
+          <div v-if="data.summary">
+            <h3 class="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-sm" :style="{ background: data.accentColor }"></span>
+              Profile
+            </h3>
+            <p class="text-xs text-slate-600 leading-relaxed">{{ data.summary }}</p>
+          </div>
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-sm" :style="{ background: data.accentColor }"></span>
+              Experience
+            </h3>
+            <div class="space-y-4">
+              <div v-for="(exp, idx) in data.experience" :key="idx" class="text-xs">
+                <div class="flex justify-between items-baseline">
+                  <h4 class="font-bold text-slate-900 text-sm">{{ exp.position }}</h4>
+                  <span class="text-[10px] font-bold" :style="{ color: data.accentColor }"
+                    >{{ exp.startDate }} - {{ exp.endDate }}</span
+                  >
+                </div>
+                <p class="text-slate-600 font-semibold text-[11px]">{{ exp.company }}</p>
+                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed whitespace-pre-wrap">
+                  {{ exp.description }}
+                </p>
+              </div>
+              <p v-if="data.experience.length === 0" class="text-xs text-slate-400 italic">
+                No experience added
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-[10px] text-slate-400 text-center pb-4">Bold Header Template</div>
+  </div>
+
+  <!-- TEMPLATE 8: Executive Photo -->
+  <div
+    v-else-if="template === 'executive-photo'"
+    class="h-full flex flex-col bg-white text-slate-800"
+    style="font-family: 'Inter', sans-serif"
+  >
+    <!-- Header band with overlapping photo -->
+    <div class="relative bg-slate-900 pt-6 pb-10 pl-32 pr-8">
+      <h2 class="text-2xl font-extrabold text-white uppercase tracking-wide leading-tight">
+        {{ data.fullname || 'Enter Full Name' }}
+      </h2>
+      <p class="text-xs font-semibold text-slate-300 uppercase tracking-widest mt-1.5">
+        {{ data.title || 'Job Title' }}
+      </p>
+      <div
+        class="absolute left-8 -bottom-8 w-20 h-20 rounded-md overflow-hidden border-4 border-white shadow-lg bg-slate-200"
+      >
+        <img v-if="data.photo" :src="data.photo" class="w-full h-full object-cover" />
+        <div
+          v-else
+          class="w-full h-full flex items-center justify-center text-slate-400 text-[9px]"
+        >
+          No Photo
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-12 flex-1">
+      <!-- Sidebar (left) -->
+      <div class="col-span-4 bg-slate-100 pt-12 pb-6 px-6">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3">Details</h3>
+        <ul class="space-y-2.5 text-[11px] text-slate-600 mb-6">
+          <li v-if="data.email" class="flex items-start gap-2">
+            <q-icon name="mdi-email-outline" size="13px" class="mt-0.5" />
+            <span class="break-all">{{ data.email }}</span>
+          </li>
+          <li v-if="data.address" class="flex items-start gap-2">
+            <q-icon name="mdi-map-marker-outline" size="13px" class="mt-0.5" />
+            <span>{{ data.address }}</span>
+          </li>
+          <li v-if="data.phone" class="flex items-start gap-2">
+            <q-icon name="mdi-phone-outline" size="13px" class="mt-0.5" />
+            <span>{{ data.phone }}</span>
+          </li>
+          <li v-if="data.website" class="flex items-start gap-2">
+            <q-icon name="mdi-web" size="13px" class="mt-0.5" />
+            <span class="break-all">{{ data.website }}</span>
+          </li>
+        </ul>
+
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-3">Skills</h3>
+        <ul class="space-y-1.5 text-[11px] text-slate-600 mb-6 list-disc list-inside">
+          <li
+            v-for="skill in data.skills
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)"
+            :key="skill"
+          >
+            {{ skill }}
+          </li>
+          <li v-if="!data.skills" class="text-slate-400 italic list-none">Not provided</li>
+        </ul>
+
+        <template v-if="data.languages">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 border-t border-slate-300 pt-4">
+            Languages
+          </h3>
+          <p class="text-[11px] font-bold text-slate-700 leading-relaxed whitespace-pre-line">
+            {{ data.languages }}
+          </p>
+        </template>
+      </div>
+
+      <!-- Main (right) -->
+      <div class="col-span-8 pt-8 pb-6 px-8">
+        <div v-if="data.summary" class="mb-6">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-900 mb-2">Summary</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">{{ data.summary }}</p>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-900 mb-3">
+            Experience
+          </h3>
+          <div class="space-y-4">
+            <div v-for="(exp, idx) in data.experience" :key="idx" class="text-xs">
+              <h4 class="font-bold text-slate-900 text-sm">
+                {{ exp.position }}, {{ exp.company }}
+              </h4>
+              <p class="text-slate-400 text-[10px] font-semibold mt-0.5 mb-1.5">
+                {{ exp.startDate }} — {{ exp.endDate }}
+              </p>
+              <ul class="list-disc list-inside space-y-0.5 text-slate-500 text-[11px] leading-relaxed">
+                <li
+                  v-for="(line, lidx) in exp.description.split('\n').filter(Boolean)"
+                  :key="lidx"
+                >
+                  {{ line }}
+                </li>
+              </ul>
+            </div>
+            <p v-if="data.experience.length === 0" class="text-xs text-slate-400 italic">
+              No experience added
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-900 mb-3">
+            Education
+          </h3>
+          <div class="space-y-3">
+            <div v-for="(edu, idx) in data.education" :key="idx" class="text-xs">
+              <h4 class="font-bold text-slate-900 text-sm">{{ edu.degree }}, {{ edu.school }}</h4>
+              <p class="text-slate-400 text-[10px] font-semibold mt-0.5">
+                {{ edu.startDate }} — {{ edu.endDate }}
+              </p>
+              <p v-if="edu.description" class="text-slate-500 text-[11px] mt-1 leading-relaxed">
+                {{ edu.description }}
+              </p>
+            </div>
+            <p v-if="data.education.length === 0" class="text-xs text-slate-400 italic">
+              No education added
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE 9: Professional Icons -->
+  <div
+    v-else
+    class="h-full flex flex-col bg-white text-slate-800 p-10"
+    style="font-family: 'Inter', sans-serif"
+  >
+    <!-- Header row: photo + name -->
+    <div class="flex items-center gap-4 pb-6 border-b border-slate-200 mb-6">
+      <img
+        v-if="data.photo"
+        :src="data.photo"
+        class="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+      />
+      <div
+        v-else
+        class="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 text-[9px] flex-shrink-0"
+      >
+        No Photo
+      </div>
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900 leading-tight">
+          {{ data.fullname || 'Enter Full Name' }}
+        </h2>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">{{ data.title || 'Job Title' }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-8 flex-1">
+      <!-- Main (left) -->
+      <div class="col-span-8 space-y-5">
+        <div v-if="data.summary">
+          <h3
+            class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 flex items-center gap-1.5"
+          >
+            <q-icon name="mdi-account-outline" size="14px" :style="{ color: data.accentColor }" />
+            Summary
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed">{{ data.summary }}</p>
+        </div>
+
+        <div>
+          <h3
+            class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 flex items-center gap-1.5"
+          >
+            <q-icon
+              name="mdi-briefcase-variant-outline"
+              size="14px"
+              :style="{ color: data.accentColor }"
+            />
+            Experience
+          </h3>
+          <div class="space-y-4">
+            <div v-for="(exp, idx) in data.experience" :key="idx" class="text-xs">
+              <h4 class="font-bold text-slate-800 text-sm">
+                {{ exp.position }}, {{ exp.company }}
+              </h4>
+              <p class="text-slate-400 text-[10px] font-semibold mb-1">
+                {{ exp.startDate }} — {{ exp.endDate }}
+              </p>
+              <p class="text-slate-500 text-[11px] leading-relaxed whitespace-pre-wrap">
+                {{ exp.description }}
+              </p>
+            </div>
+            <p v-if="data.experience.length === 0" class="text-xs text-slate-400 italic">
+              No experience added
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3
+            class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2 flex items-center gap-1.5"
+          >
+            <q-icon name="mdi-school-outline" size="14px" :style="{ color: data.accentColor }" />
+            Education
+          </h3>
+          <div class="space-y-3">
+            <div v-for="(edu, idx) in data.education" :key="idx" class="text-xs">
+              <h4 class="font-bold text-slate-800 text-sm">{{ edu.degree }}, {{ edu.school }}</h4>
+              <p class="text-slate-400 text-[10px] font-semibold">
+                {{ edu.startDate }} — {{ edu.endDate }}
+              </p>
+              <p v-if="edu.description" class="text-slate-500 text-[11px] mt-0.5">
+                {{ edu.description }}
+              </p>
+            </div>
+            <p v-if="data.education.length === 0" class="text-xs text-slate-400 italic">
+              No education added
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar (right) -->
+      <div class="col-span-4 space-y-5">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2">Details</h3>
+          <div class="space-y-1 text-[11px] text-slate-600">
+            <p v-if="data.address">{{ data.address }}</p>
+            <p v-if="data.phone">{{ data.phone }}</p>
+            <p v-if="data.email" class="break-all">{{ data.email }}</p>
+            <p v-if="data.website" class="break-all">{{ data.website }}</p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2">Skills</h3>
+          <div class="space-y-1 text-[11px] text-slate-600">
+            <p
+              v-for="skill in data.skills
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)"
+              :key="skill"
+            >
+              {{ skill }}
+            </p>
+            <p v-if="!data.skills" class="text-slate-400 italic">Not provided</p>
+          </div>
+        </div>
+
+        <div v-if="data.languages">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 mb-2">
+            Languages
+          </h3>
+          <p class="text-[11px] text-slate-600 whitespace-pre-line">{{ data.languages }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-[10px] text-slate-400 text-right pt-6">Generated as PDF</div>
   </div>
 </template>
 

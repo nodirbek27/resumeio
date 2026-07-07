@@ -13,6 +13,10 @@ const resumeTemplates = [
   { id: 'creative', label: 'Creative Accent' },
   { id: 'minimal', label: 'Minimal Lines' },
   { id: 'sidebar-right', label: 'Sidebar Right' },
+  { id: 'timeline', label: 'Elegant Timeline' },
+  { id: 'bold-header', label: 'Bold Header' },
+  { id: 'executive-photo', label: 'Executive Photo' },
+  { id: 'professional-icons', label: 'Professional Icons' },
 ]
 
 const $q = useQuasar()
@@ -396,9 +400,53 @@ const downloadPDF = async () => {
                     ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold'
                     : 'border-slate-200 text-slate-600 hover:bg-slate-50',
                 ]"
-                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition col-span-2 sm:col-span-1"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
               >
                 Sidebar Right
+              </button>
+              <button
+                @click="activeTemplate = 'timeline'"
+                :class="[
+                  activeTemplate === 'timeline'
+                    ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold'
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50',
+                ]"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
+              >
+                Elegant Timeline
+              </button>
+              <button
+                @click="activeTemplate = 'bold-header'"
+                :class="[
+                  activeTemplate === 'bold-header'
+                    ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold'
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50',
+                ]"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
+              >
+                Bold Header
+              </button>
+              <button
+                @click="activeTemplate = 'executive-photo'"
+                :class="[
+                  activeTemplate === 'executive-photo'
+                    ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold'
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50',
+                ]"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
+              >
+                Executive Photo
+              </button>
+              <button
+                @click="activeTemplate = 'professional-icons'"
+                :class="[
+                  activeTemplate === 'professional-icons'
+                    ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold'
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50',
+                ]"
+                class="px-2 py-3 border-2 rounded-xl text-center text-xs sm:text-sm transition"
+              >
+                Professional Icons
               </button>
             </div>
 

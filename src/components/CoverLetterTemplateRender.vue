@@ -172,7 +172,7 @@ defineProps<{
 
   <!-- TEMPLATE 3: Creative Accent -->
   <div
-    v-else
+    v-else-if="template === 'creative'"
     class="h-full flex flex-col justify-between bg-white text-slate-800"
     style="font-family: 'Outfit', sans-serif"
   >
@@ -232,5 +232,126 @@ defineProps<{
     </div>
 
     <div class="text-[10px] text-slate-400 text-center pb-4">Creative Accent Template</div>
+  </div>
+
+  <!-- TEMPLATE 4: Elegant Timeline -->
+  <div
+    v-else-if="template === 'timeline'"
+    class="h-full p-10 flex flex-col justify-between bg-white text-slate-800"
+    style="font-family: 'Inter', sans-serif"
+  >
+    <div>
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">
+          {{ data.senderName || 'Your Name' }}
+        </h2>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600 mt-2">
+          {{ data.senderTitle }}
+        </p>
+        <div
+          class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-slate-500 mt-3 font-mono"
+        >
+          <span v-if="data.senderEmail">{{ data.senderEmail }}</span>
+          <span v-if="data.senderPhone">{{ data.senderPhone }}</span>
+          <span v-if="data.senderWebsite">{{ data.senderWebsite }}</span>
+        </div>
+      </div>
+
+      <!-- Meta block with decorative timeline spine -->
+      <div class="relative pl-6 border-l-2 border-slate-100 mb-8">
+        <span
+          class="absolute -left-[7px] top-0.5 w-3 h-3 rounded-full bg-indigo-600 border-2 border-white"
+        ></span>
+        <div class="flex justify-between items-start text-xs">
+          <div class="space-y-0.5 text-slate-600">
+            <strong class="text-slate-800">{{ data.recipientName }}</strong>
+            <p>{{ data.recipientTitle }}</p>
+            <p class="font-semibold">{{ data.companyName }}</p>
+            <p class="text-[11px] text-slate-500">{{ data.companyAddress }}</p>
+          </div>
+          <div class="text-slate-500 font-mono text-[11px]">{{ data.date }}</div>
+        </div>
+      </div>
+
+      <!-- Subject Line -->
+      <div class="mb-4 text-center">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800">
+          Subject: {{ data.subject || 'Job Application' }}
+        </h3>
+      </div>
+
+      <!-- Salutation -->
+      <p class="text-xs font-bold mb-4 text-slate-900">{{ data.salutation }}</p>
+
+      <!-- Letter Body -->
+      <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap space-y-4">
+        {{ data.bodyText || 'Write your letter text here...' }}
+      </div>
+
+      <!-- Sign off -->
+      <div class="mt-8 text-xs text-slate-800 whitespace-pre-wrap">
+        {{ data.signOff }}
+      </div>
+    </div>
+
+    <div class="text-[10px] text-slate-400 text-center pt-6">Elegant Timeline Template</div>
+  </div>
+
+  <!-- TEMPLATE 5: Bold Header -->
+  <div
+    v-else
+    class="h-full flex flex-col justify-between bg-white text-slate-800"
+    style="font-family: 'Outfit', sans-serif"
+  >
+    <div>
+      <div class="p-8 text-white" style="background: #4338ca">
+        <h2 class="text-2xl font-black uppercase tracking-wide leading-none">
+          {{ data.senderName || 'Your Name' }}
+        </h2>
+        <p class="text-xs font-bold uppercase tracking-[0.25em] text-white/80 mt-2">
+          {{ data.senderTitle }}
+        </p>
+        <div class="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-white/90 mt-5 font-mono">
+          <span v-if="data.senderPhone"
+            ><q-icon name="mdi-phone" size="13px" /> {{ data.senderPhone }}</span
+          >
+          <span v-if="data.senderEmail"
+            ><q-icon name="mdi-email" size="13px" /> {{ data.senderEmail }}</span
+          >
+          <span v-if="data.senderWebsite"
+            ><q-icon name="mdi-web" size="13px" /> {{ data.senderWebsite }}</span
+          >
+        </div>
+      </div>
+
+      <div class="p-8">
+        <div class="flex justify-between items-start text-xs mb-6">
+          <div class="space-y-0.5 text-slate-600">
+            <strong class="text-slate-900 block">{{ data.recipientName }}</strong>
+            <span class="block">{{ data.recipientTitle }}</span>
+            <span class="font-semibold block">{{ data.companyName }}</span>
+            <span class="text-[11px] block">{{ data.companyAddress }}</span>
+          </div>
+          <div class="text-slate-400 font-mono text-[11px]">{{ data.date }}</div>
+        </div>
+
+        <h3 class="text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-sm" style="background: #4338ca"></span>
+          Subject: {{ data.subject || 'Job Application' }}
+        </h3>
+
+        <p class="text-xs font-bold text-slate-900 mb-4">{{ data.salutation }}</p>
+
+        <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+          {{ data.bodyText || 'Write your letter text here...' }}
+        </div>
+
+        <div class="mt-6 text-xs text-slate-700 whitespace-pre-wrap">
+          {{ data.signOff }}
+        </div>
+      </div>
+    </div>
+
+    <div class="text-[10px] text-slate-400 text-center pb-4">Bold Header Template</div>
   </div>
 </template>
