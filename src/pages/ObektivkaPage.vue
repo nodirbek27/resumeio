@@ -197,8 +197,8 @@ const clearAllData = () => {
 
 .obektivka-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: nowrap;
+  gap: 8px;
   align-items: center;
 }
 
@@ -206,7 +206,7 @@ const clearAllData = () => {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 18px;
+  padding: 8px 14px;
   background: #fee2e2;
   color: #dc2626;
   border: none;
@@ -214,6 +214,7 @@ const clearAllData = () => {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
   transition: background 0.2s;
 }
 

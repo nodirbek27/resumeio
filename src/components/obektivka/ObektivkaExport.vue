@@ -117,67 +117,51 @@ const onConfirmDownload = () => {
 
 <style scoped>
 .download-actions {
-  display: flex;
-  gap: 12px;
-  width: 100%;
+  display: contents;
 }
 
-/* base button */
 .btn {
-  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: nowrap;
-  gap: 8px;
-
-  padding: 12px 0;
-  border-radius: 12px;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
   border: none;
-
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: white;
-
   cursor: pointer;
   transition: all 0.2s ease;
-
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
   user-select: none;
 }
 
-/* icon */
 .icon {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
-/* PDF button */
 .btn-pdf {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .btn-pdf:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
 }
 
-.btn-pdf:active {
-  transform: scale(0.98);
-}
-
-/* Word button */
 .btn-word {
   background: linear-gradient(135deg, #16a34a, #15803d);
 }
 
 .btn-word:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.35);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+  transform: translateY(-1px);
 }
 
-.btn-word:active {
-  transform: scale(0.98);
+.btn:active {
+  transform: scale(0.97);
 }
 
 /* mobile */

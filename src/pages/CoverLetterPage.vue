@@ -2,29 +2,21 @@
 import { reactive, ref, onMounted, onBeforeUnmount, watch, computed, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import DonateDialog from '@/components/DonateDialog.vue'
+import TemplatePickerCarousel from '@/components/TemplatePickerCarousel.vue'
+import CoverLetterTemplateRender, {
+  type CoverLetterData,
+} from '@/components/CoverLetterTemplateRender.vue'
+
+const coverLetterTemplates = [
+  { id: 'modern', label: 'Modern Minimalist' },
+  { id: 'classic', label: 'Classic Professional' },
+  { id: 'creative', label: 'Creative Accent' },
+]
 
 const $q = useQuasar()
 const showDonateDialog = ref(false)
 // Matches Tailwind's `lg` breakpoint (1024px) used for the grid-cols layout switch
 const isCompactLayout = computed(() => $q.screen.width < 1024)
-
-interface CoverLetterData {
-  senderName: string
-  senderTitle: string
-  senderEmail: string
-  senderPhone: string
-  senderAddress: string
-  senderWebsite: string
-  date: string
-  recipientName: string
-  recipientTitle: string
-  companyName: string
-  companyAddress: string
-  subject: string
-  salutation: string
-  bodyText: string
-  signOff: string
-}
 
 const STORAGE_KEY = 'cover_letter_builder_data'
 
@@ -325,7 +317,20 @@ const downloadPDF = async () => {
               <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
               Choose Template
             </h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <!-- Mobile: stacked card carousel with live preview thumbnails -->
+            <TemplatePickerCarousel
+              v-if="isCompactLayout"
+              v-model="activeTemplate"
+              :templates="coverLetterTemplates"
+              class="mb-2"
+            >
+              <template #thumb="{ id }">
+                <CoverLetterTemplateRender :template="id" :data="formData" />
+              </template>
+            </TemplatePickerCarousel>
+
+            <!-- Desktop/tablet: original button grid -->
+            <div v-else class="grid grid-cols-3 gap-3">
               <button
                 @click="activeTemplate = 'modern'"
                 :class="[activeTemplate === 'modern' ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
@@ -494,191 +499,7 @@ const downloadPDF = async () => {
               }"
               ref="previewRef"
             >
-
-            <!-- TEMPLATE 1: Modern Minimalist -->
-            <div v-if="activeTemplate === 'modern'" class="h-full grid grid-cols-12 bg-white" style="font-family: 'Inter', sans-serif;">
-              <!-- Sidebar -->
-              <div class="col-span-4 bg-slate-900 text-slate-100 p-6 flex flex-col justify-between h-full">
-                <div class="space-y-6">
-                  <div>
-                    <h3 class="text-sm font-extrabold text-white leading-tight break-words">{{ formData.senderName || 'Your Name' }}</h3>
-                    <p class="text-[11px] text-indigo-400 font-semibold tracking-wide mt-1">{{ formData.senderTitle }}</p>
-                  </div>
-
-                  <div class="space-y-4 pt-4 border-t border-slate-800">
-                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contact</h4>
-                    <ul class="space-y-3 text-xs text-slate-300">
-                      <li v-if="formData.senderPhone" class="flex gap-2">
-                        <q-icon name="mdi-phone" class="text-indigo-400" size="14px" />
-                        <span class="break-all">{{ formData.senderPhone }}</span>
-                      </li>
-                      <li v-if="formData.senderEmail" class="flex gap-2">
-                        <q-icon name="mdi-email" class="text-indigo-400" size="14px" />
-                        <span class="break-all">{{ formData.senderEmail }}</span>
-                      </li>
-                      <li v-if="formData.senderAddress" class="flex gap-2">
-                        <q-icon name="mdi-map-marker" class="text-indigo-400" size="14px" />
-                        <span>{{ formData.senderAddress }}</span>
-                      </li>
-                      <li v-if="formData.senderWebsite" class="flex gap-2">
-                        <q-icon name="mdi-web" class="text-indigo-400" size="14px" />
-                        <span class="break-all">{{ formData.senderWebsite }}</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="text-[10px] text-slate-600 text-center">
-                  Modern Minimalist
-                </div>
-              </div>
-
-              <!-- Main Content -->
-              <div class="col-span-8 p-8 flex flex-col justify-between h-full bg-slate-50/20">
-                <div>
-                  <div class="text-right text-[10px] font-semibold text-slate-400 font-mono">
-                    {{ formData.date }}
-                  </div>
-
-                  <!-- Recipient details block -->
-                  <div class="mb-6 text-xs text-slate-600 space-y-1 mt-4">
-                    <p class="font-bold text-slate-800 text-sm">{{ formData.recipientName }}</p>
-                    <p>{{ formData.recipientTitle }}</p>
-                    <p class="font-semibold text-slate-700">{{ formData.companyName }}</p>
-                    <p>{{ formData.companyAddress }}</p>
-                  </div>
-
-                  <!-- Subject Line -->
-                  <div class="mb-6 border-b border-slate-200 pb-2">
-                    <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Subject: {{ formData.subject || 'Job Application' }}</h2>
-                  </div>
-
-                  <!-- Salutation -->
-                  <p class="text-xs font-bold text-slate-800 mb-4">{{ formData.salutation }}</p>
-
-                  <!-- Letter Body -->
-                  <div class="text-xs text-slate-600 leading-relaxed space-y-4 whitespace-pre-wrap">
-                    {{ formData.bodyText || 'Write your letter text here...' }}
-                  </div>
-
-                  <!-- Sign-off -->
-                  <div class="mt-8 text-xs text-slate-700 whitespace-pre-wrap">
-                    {{ formData.signOff }}
-                  </div>
-                </div>
-
-                <div class="text-[10px] text-slate-400 text-right">
-                  Generated as PDF
-                </div>
-              </div>
-            </div>
-
-            <!-- TEMPLATE 2: Classic Professional -->
-            <div v-else-if="activeTemplate === 'classic'" class="h-full p-10 flex flex-col justify-between bg-white text-slate-800" style="font-family: 'Georgia', serif;">
-              <div>
-                <!-- Top Header -->
-                <div class="text-center pb-4 border-b border-slate-800 mb-6 font-sans">
-                  <h2 class="text-2xl font-bold tracking-wide text-slate-900">{{ formData.senderName || 'Your Name' }}</h2>
-                  <p class="text-[10px] font-bold text-indigo-700 uppercase tracking-widest mt-1">{{ formData.senderTitle }}</p>
-                  <div class="flex flex-wrap justify-center gap-x-4 text-[10px] text-slate-500 mt-2 font-mono">
-                    <span v-if="formData.senderEmail">{{ formData.senderEmail }}</span>
-                    <span v-if="formData.senderPhone">{{ formData.senderPhone }}</span>
-                    <span v-if="formData.senderWebsite">{{ formData.senderWebsite }}</span>
-                  </div>
-                </div>
-
-                <!-- Date & Recipient Details -->
-                <div class="flex justify-between items-start text-xs mb-6 font-sans">
-                  <div class="space-y-0.5 text-slate-600">
-                    <strong class="text-slate-800">{{ formData.recipientName }}</strong>
-                    <p>{{ formData.recipientTitle }}</p>
-                    <p class="font-semibold">{{ formData.companyName }}</p>
-                    <p class="text-[11px] text-slate-500">{{ formData.companyAddress }}</p>
-                  </div>
-                  <div class="text-slate-500 font-mono text-[11px]">
-                    {{ formData.date }}
-                  </div>
-                </div>
-
-                <!-- Subject Line -->
-                <div class="mb-4">
-                  <h3 class="text-xs font-bold uppercase tracking-widest text-slate-800 border-b border-slate-200 pb-1 font-sans">Subject: {{ formData.subject }}</h3>
-                </div>
-
-                <!-- Salutation -->
-                <p class="text-xs font-bold mb-4 font-sans text-slate-900">{{ formData.salutation }}</p>
-
-                <!-- Letter Body -->
-                <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap space-y-4">
-                  {{ formData.bodyText || 'Enter your letter text...' }}
-                </div>
-
-                <!-- Sign off -->
-                <div class="mt-8 text-xs text-slate-800 font-sans whitespace-pre-wrap">
-                  {{ formData.signOff }}
-                </div>
-              </div>
-
-              <div class="text-[10px] text-slate-400 text-center font-sans">
-                Professional Classic Template
-              </div>
-            </div>
-
-            <!-- TEMPLATE 3: Creative Accent -->
-            <div v-else class="h-full flex flex-col justify-between bg-white text-slate-800" style="font-family: 'Outfit', sans-serif;">
-              <div>
-                <!-- Top Accent Banner -->
-                <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white p-6">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <h2 class="text-2xl font-black tracking-wide">{{ formData.senderName || 'Your Name' }}</h2>
-                      <p class="text-xs font-semibold text-indigo-200 tracking-wider mt-1">{{ formData.senderTitle }}</p>
-                    </div>
-                    <div class="text-right text-[10px] font-mono text-indigo-100">
-                      {{ formData.date }}
-                    </div>
-                  </div>
-
-                  <div class="flex flex-wrap gap-x-4 text-[10px] text-indigo-100 mt-4 font-mono">
-                    <span v-if="formData.senderPhone"><q-icon name="mdi-phone" /> {{ formData.senderPhone }}</span>
-                    <span v-if="formData.senderEmail"><q-icon name="mdi-email" /> {{ formData.senderEmail }}</span>
-                    <span v-if="formData.senderWebsite"><q-icon name="mdi-web" /> {{ formData.senderWebsite }}</span>
-                  </div>
-                </div>
-
-                <!-- Main Content -->
-                <div class="p-6">
-                  <!-- Recipient Block -->
-                  <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-5 text-xs text-slate-600">
-                    <p class="text-[10px] uppercase font-bold text-indigo-700 tracking-wider mb-1">Sending to:</p>
-                    <strong class="text-slate-800 text-sm block">{{ formData.recipientName }}</strong>
-                    <span class="block">{{ formData.recipientTitle }}</span>
-                    <span class="font-semibold block mt-0.5 text-slate-700">{{ formData.companyName }}</span>
-                    <span class="text-[11px]">{{ formData.companyAddress }}</span>
-                  </div>
-
-                  <!-- Subject -->
-                  <h3 class="text-xs font-extrabold text-indigo-800 uppercase tracking-widest mb-3">Subject: {{ formData.subject }}</h3>
-
-                  <!-- Salutation -->
-                  <p class="text-xs font-bold text-slate-800 mb-3">{{ formData.salutation }}</p>
-
-                  <!-- Letter Body -->
-                  <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
-                    {{ formData.bodyText || 'Write your letter text here...' }}
-                  </div>
-
-                  <!-- Sign-off -->
-                  <div class="mt-6 text-xs text-slate-700 whitespace-pre-wrap">
-                    {{ formData.signOff }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="text-[10px] text-slate-400 text-center pb-4">
-                Creative Accent Template
-              </div>
-            </div>
-
+              <CoverLetterTemplateRender :template="activeTemplate" :data="formData" />
             </div>
           </div>
         </div>
