@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const stats = [
-  { value: '5', label: 'Resume templates' },
-  { value: '3', label: 'Cover letter styles' },
+  { value: '9', label: 'Resume templates' },
+  { value: '5', label: 'Cover letter styles' },
   { value: '100%', label: 'Free forever' },
   { value: '0', label: 'Account needed' },
 ]
