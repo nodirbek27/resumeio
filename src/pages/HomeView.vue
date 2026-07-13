@@ -90,7 +90,9 @@ const benefits = [
       <div class="hero-right" aria-hidden="true">
         <div class="resume-mock">
           <div class="rm-sidebar">
-            <div class="rm-avatar"></div>
+            <div class="rm-avatar">
+              <q-icon name="mdi-account" size="20px" />
+            </div>
             <div class="rm-line w70 mt10"></div>
             <div class="rm-line w50 op60 mt4"></div>
             <div class="rm-divider mt12"></div>
@@ -109,8 +111,8 @@ const benefits = [
             </div>
           </div>
           <div class="rm-main">
-            <div class="rm-name"></div>
-            <div class="rm-jobtitle mt5"></div>
+            <div class="rm-name">Sophia Bennett</div>
+            <div class="rm-jobtitle mt5">Product Designer</div>
             <div class="rm-section-label mt14"></div>
             <div class="rm-line w100 mt8 dark"></div>
             <div class="rm-line w100 op70 mt5 dark"></div>
@@ -486,7 +488,11 @@ const benefits = [
   height: 40px;
   border-radius: 50%;
   background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.65);
   margin: 0 auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rm-main {
@@ -523,16 +529,20 @@ const benefits = [
 .rm-tag.w2 { width: 36px; }
 .rm-tag.w3 { width: 44px; }
 .rm-name {
-  height: 8px;
-  width: 70%;
-  border-radius: 4px;
-  background: rgba(15,23,42,0.7);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: rgba(15,23,42,0.85);
+  white-space: nowrap;
 }
 .rm-jobtitle {
-  height: 5px;
-  width: 50%;
-  border-radius: 3px;
-  background: rgba(var(--q-primary-rgb, 35,159,85), 0.55);
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--q-primary);
+  opacity: 0.85;
+  white-space: nowrap;
 }
 .rm-section-label {
   height: 4px;
