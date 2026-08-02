@@ -25,7 +25,7 @@ const routes: RouteRecordRaw[] = [
         name: 'resume',
         component: () => import('@/pages/ResumePage.vue'),
         meta: {
-          title: 'menu.resume',
+          title: 'Resume',
           seoTitle: 'Resume Builder — Create a Professional CV Online | ResumeIO',
           description:
             'Build a professional resume (CV) online with modern templates and a real-time preview. Download as PDF or Word for free — no sign-up required.',
@@ -37,23 +37,11 @@ const routes: RouteRecordRaw[] = [
         name: 'coverLetter',
         component: () => import('@/pages/CoverLetterPage.vue'),
         meta: {
-          title: 'menu.coverLetter',
+          title: 'Cover Letter',
           seoTitle: 'Cover Letter Builder — Write a Professional Cover Letter Online | ResumeIO',
           description:
             'Create a professional cover letter online in minutes with modern templates. Download as PDF or Word for free — no sign-up required.',
           canonical: `${SITE_URL}/cover-letter`,
-        },
-      },
-      {
-        path: 'obektivka',
-        name: 'obektivka',
-        component: () => import('@/pages/ObektivkaPage.vue'),
-        meta: {
-          title: 'menu.obektivka',
-          seoTitle: 'Obektivka (Official Reference Letter) Maker — ResumeIO',
-          description:
-            'Create an official Obektivka reference letter for Uzbekistan government and private institutions. A4 format, official standard. Download as Word or PDF for free.',
-          canonical: `${SITE_URL}/obektivka`,
         },
       },
     ],
@@ -73,7 +61,7 @@ const router = createRouter({
   routes,
 })
 
-// Har sahifada title va meta description yangilanadi
+// Updates the document title and meta description on every navigation
 router.afterEach((to) => {
   const meta = to.meta as Record<string, string>
 

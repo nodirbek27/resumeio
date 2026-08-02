@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n()
-
 const stats = [
   { value: '9', label: 'Resume templates' },
   { value: '5', label: 'Cover letter styles' },
@@ -45,13 +41,13 @@ const benefits = [
           <span>Free &middot; No sign-up &middot; Instant PDF</span>
         </div>
 
-        <h1 class="hero-title">{{ t('home.welcome_message') }}</h1>
-        <p class="hero-subtitle">{{ t('home.subtitle') }}</p>
+        <h1 class="hero-title">Create your professional documents</h1>
+        <p class="hero-subtitle">Resume and Cover Letter — ready to download as PDF, all in one place.</p>
 
         <q-btn
           color="primary"
           icon="mdi-file-account-outline"
-          :label="t('home.create_resume')"
+          label="Create Resume"
           unelevated
           rounded
           to="/resume"
@@ -61,12 +57,7 @@ const benefits = [
         <div class="hero-sec-links">
           <router-link to="/cover-letter" class="sec-link">
             <q-icon name="mdi-email-edit-outline" size="15px" />
-            {{ t('home.create_cover_letter') }}
-          </router-link>
-          <span class="sec-dot">&middot;</span>
-          <router-link to="/obektivka" class="sec-link">
-            <q-icon name="mdi-card-account-details-outline" size="15px" />
-            {{ t('home.create_obektivka') }}
+            Create Cover Letter
           </router-link>
         </div>
 
@@ -162,7 +153,7 @@ const benefits = [
     <!-- ═══════════════════════════════════ DOCUMENT TYPES ═══════════════════════════════════ -->
     <section class="docs-section">
       <div class="section-head">
-        <h2>Three documents, one place</h2>
+        <h2>Everything you need, one place</h2>
         <p>Everything a job seeker needs — built and exported in minutes.</p>
       </div>
 
@@ -193,10 +184,10 @@ const benefits = [
             </div>
           </div>
           <div class="doc-info">
-            <h3>{{ t('home.feature.resume_title') }}</h3>
-            <p>{{ t('home.feature.resume_desc') }}</p>
+            <h3>Professional Resume</h3>
+            <p>Create modern resumes that match international standards.</p>
             <router-link to="/resume" class="doc-cta doc-cta--primary">
-              {{ t('home.create_resume') }}
+              Create Resume
               <q-icon name="mdi-arrow-right" size="16px" />
             </router-link>
           </div>
@@ -223,49 +214,10 @@ const benefits = [
             </div>
           </div>
           <div class="doc-info">
-            <h3>{{ t('home.feature.cover_letter_title') }}</h3>
-            <p>{{ t('home.feature.cover_letter_desc') }}</p>
+            <h3>Cover Letter</h3>
+            <p>Write a cover letter that impresses recruiters.</p>
             <router-link to="/cover-letter" class="doc-cta doc-cta--cover">
-              {{ t('home.create_cover_letter') }}
-              <q-icon name="mdi-arrow-right" size="16px" />
-            </router-link>
-          </div>
-        </div>
-
-        <!-- Obektivka -->
-        <div class="doc-card">
-          <div class="doc-preview doc-preview--obektivka">
-            <div class="dp-ob-head">
-              <div class="dp-avatar large"></div>
-              <div class="dp-ob-info">
-                <div class="dp-name"></div>
-                <div class="dp-title mt4"></div>
-              </div>
-            </div>
-            <div class="dp-ob-grid mt10">
-              <div class="dp-ob-cell">
-                <div class="dp-label"></div>
-                <div class="dp-line w80 mt4"></div>
-              </div>
-              <div class="dp-ob-cell">
-                <div class="dp-label"></div>
-                <div class="dp-line w70 mt4"></div>
-              </div>
-              <div class="dp-ob-cell">
-                <div class="dp-label"></div>
-                <div class="dp-line w60 mt4"></div>
-              </div>
-              <div class="dp-ob-cell">
-                <div class="dp-label"></div>
-                <div class="dp-line w75 mt4"></div>
-              </div>
-            </div>
-          </div>
-          <div class="doc-info">
-            <h3>{{ t('home.feature.obektivka_title') }}</h3>
-            <p>{{ t('home.feature.obektivka_desc') }}</p>
-            <router-link to="/obektivka" class="doc-cta doc-cta--obektivka">
-              {{ t('home.create_obektivka') }}
+              Create Cover Letter
               <q-icon name="mdi-arrow-right" size="16px" />
             </router-link>
           </div>
@@ -327,7 +279,7 @@ const benefits = [
     <section class="cta-section">
       <div class="cta-inner">
         <h2>Ready to land your next job?</h2>
-        <p>Build your resume, cover letter, and obektivka — free, fast, no account needed.</p>
+        <p>Build your resume and cover letter — free, fast, no account needed.</p>
         <div class="cta-buttons">
           <q-btn
             color="white"
@@ -435,11 +387,6 @@ const benefits = [
   transition: color 0.2s;
 }
 .sec-link:hover { color: var(--q-primary); }
-
-.sec-dot {
-  color: #cbd5e1;
-  font-size: 16px;
-}
 
 .hero-trust {
   display: flex;
@@ -670,8 +617,10 @@ const benefits = [
 
 .docs-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 .doc-card {
@@ -704,10 +653,6 @@ const benefits = [
   background: linear-gradient(135deg, #faf8ff 0%, #f3e8ff 100%);
   flex-direction: column;
 }
-.doc-preview--obektivka {
-  background: linear-gradient(135deg, #fff8f0 0%, #fef3c7 100%);
-  flex-direction: column;
-}
 
 /* Shared preview elements */
 .dp-sidebar {
@@ -724,12 +669,10 @@ const benefits = [
   background: rgba(255,255,255,0.2);
   margin: 0 auto;
 }
-.dp-avatar.large { width: 36px; height: 36px; }
 .dp-name { height: 6px; width: 65%; border-radius: 3px; background: rgba(15,23,42,0.7); }
 .dp-title { height: 4px; width: 45%; border-radius: 2px; }
 .doc-preview--resume .dp-title { background: rgba(var(--q-primary-rgb,35,159,85),0.5); }
 .doc-preview--cover .dp-title { background: rgba(124,58,237,0.45); }
-.doc-preview--obektivka .dp-title { background: rgba(245,124,0,0.5); }
 
 .dp-line { height: 4px; border-radius: 2px; background: rgba(15,23,42,0.12); }
 .dp-line.w100 { width: 100%; }
@@ -761,15 +704,6 @@ const benefits = [
   border-bottom: 1px solid rgba(124,58,237,0.15);
 }
 .dp-cover-body { flex: 1; }
-
-/* Obektivka preview specific */
-.dp-ob-head { display: flex; align-items: center; gap: 8px; }
-.dp-ob-info { flex: 1; }
-.dp-ob-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
 
 /* margin helpers for dp */
 .dp-avatar.mt10, .mt10 { margin-top: 10px; }
@@ -810,7 +744,6 @@ const benefits = [
 .doc-cta:hover { gap: 8px; }
 .doc-cta--primary   { color: var(--q-primary); }
 .doc-cta--cover     { color: #7c3aed; }
-.doc-cta--obektivka { color: #d97706; }
 
 /* ─── HOW IT WORKS ───────────────────────────────────────────────────────────── */
 .steps-section {

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { useI18n } from 'vue-i18n'
 import { menus } from '@/router'
 import { useCommonStore } from '@/stores/common'
 
 const $q = useQuasar()
-const { t } = useI18n()
 
 const store = useCommonStore()
 
@@ -15,7 +13,6 @@ const navMenus = menus.filter(m => m.meta?.title)
 const menuIconMap: Record<string, string> = {
   resume: 'mdi-file-account-outline',
   coverLetter: 'mdi-email-edit-outline',
-  obektivka: 'mdi-card-account-details-outline',
 }
 
 function getMenuIcon(name: string | symbol | null | undefined): string {
@@ -33,7 +30,7 @@ const drawer = ref(false)
 ======================= */
 const changeTheme = (color: string) => {
   document.body.style.setProperty('--q-primary', color)
-  store.chengeTheme(color)
+  store.changeTheme(color)
 }
 
 /* =======================
@@ -84,7 +81,7 @@ onUnmounted(() => {
             <RouterLink v-for="menu in navMenus" :key="menu.name" :to="{ name: menu.name as string }"
               class="menu-link q-mx-xs" active-class="active-menu">
               <q-icon :name="getMenuIcon(menu.name)" size="15px" class="menu-link-icon" />
-              {{ t(menu.meta?.title as string) }}
+              {{ menu.meta?.title }}
             </RouterLink>
           </div>
 
@@ -135,7 +132,7 @@ onUnmounted(() => {
             @click="drawer = false"
           >
             <q-icon :name="getMenuIcon(menu.name)" size="20px" />
-            {{ t(menu.meta?.title as string) }}
+            {{ menu.meta?.title }}
           </RouterLink>
         </nav>
 
@@ -180,7 +177,7 @@ onUnmounted(() => {
 
         <nav class="footer-links">
           <RouterLink v-for="menu in navMenus" :key="menu.name" :to="{ name: menu.name as string }" class="footer-link">
-            {{ t(menu.meta?.title as string) }}
+            {{ menu.meta?.title }}
           </RouterLink>
         </nav>
 
