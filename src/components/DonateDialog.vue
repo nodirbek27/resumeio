@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useQuasar } from 'quasar'
-
 interface Props {
   modelValue: boolean
 }
@@ -13,22 +10,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const $q = useQuasar()
-
-const CARD_NUMBER = '4231 2000 8021 2037'
-
-const copied = ref(false)
-
-const copyCard = async () => {
-  try {
-    await navigator.clipboard.writeText(CARD_NUMBER.replace(/\s/g, ''))
-    copied.value = true
-    $q.notify({ type: 'positive', message: 'Card number copied', position: 'top', timeout: 1500 })
-    setTimeout(() => (copied.value = false), 1500)
-  } catch {
-    $q.notify({ type: 'negative', message: 'Could not copy', position: 'top' })
-  }
-}
+const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/nodirjon09a'
 
 const close = () => emit('update:modelValue', false)
 
@@ -52,23 +34,17 @@ const proceedDownload = () => {
         <p class="donate-sub">This tool is free. If it helped you, consider supporting its development.</p>
       </div>
 
-      <div class="card-visual">
-        <div class="card-visual-top">
-          <q-icon name="mdi-credit-card-outline" size="20px" />
-          <span class="card-brand">VISA</span>
-        </div>
-        <p class="card-number">{{ CARD_NUMBER }}</p>
-      </div>
-
       <q-btn
-        :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
-        :label="copied ? 'Copied!' : 'Copy card number'"
-        :color="copied ? 'positive' : 'primary'"
+        icon="mdi-coffee"
+        label="Buy Me a Coffee"
+        :href="BUY_ME_A_COFFEE_URL"
+        target="_blank"
+        rel="noopener noreferrer"
+        color="primary"
         outline
         rounded
         unelevated
-        class="copy-btn"
-        @click="copyCard"
+        class="coffee-btn"
       />
 
       <q-separator class="q-my-md" />
@@ -133,50 +109,7 @@ const proceedDownload = () => {
   margin: 0;
 }
 
-.card-visual {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 16px;
-  padding: 20px;
-  color: white;
-  margin-bottom: 14px;
-  position: relative;
-  overflow: hidden;
-}
-
-.card-visual::after {
-  content: '';
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 50%;
-  top: -60px;
-  right: -40px;
-}
-
-.card-visual-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.card-brand {
-  font-style: italic;
-  font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-}
-
-.card-number {
-  font-family: 'Courier New', monospace;
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: 2px;
-  margin: 0;
-}
-
-.copy-btn {
+.coffee-btn {
   width: 100%;
   font-weight: 600 !important;
   font-size: 13px !important;

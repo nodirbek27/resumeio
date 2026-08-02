@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
+import Reveal from '@/components/RevealSection.vue'
+
 const stats = [
   { value: '9', label: 'Resume templates' },
   { value: '5', label: 'Cover letter styles' },
@@ -28,12 +31,59 @@ const benefits = [
     desc: 'Download a crisp, print-ready PDF instantly. No watermarks, no limits.',
   },
 ]
+
+const faqs = [
+  {
+    q: 'Is ResumeIO really free to use?',
+    a: 'Yes. Building a resume or cover letter, previewing it live, and exporting it as a PDF is completely free — no account, no hidden paywall, no watermark.',
+  },
+  {
+    q: 'Is my personal information stored anywhere?',
+    a: "No. Everything you type is saved in your browser's local storage only. Nothing is uploaded to a server, so your data never leaves your device.",
+  },
+  {
+    q: 'What file formats can I download?',
+    a: 'You can export both your resume and cover letter as a print-ready PDF with a single click.',
+  },
+  {
+    q: 'Can I switch templates without losing my data?',
+    a: 'Yes. Your information is kept separate from the template design, so you can switch between Modern, Classic, Creative and other styles anytime without re-entering anything.',
+  },
+]
+
+const openFaq = ref<number | null>(0)
+
+const FAQ_JSONLD_ID = 'seo-jsonld-faq'
+
+onMounted(() => {
+  let el = document.getElementById(FAQ_JSONLD_ID) as HTMLScriptElement | null
+  if (!el) {
+    el = document.createElement('script')
+    el.type = 'application/ld+json'
+    el.id = FAQ_JSONLD_ID
+    document.head.appendChild(el)
+  }
+  el.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  })
+})
+
+onUnmounted(() => {
+  document.getElementById(FAQ_JSONLD_ID)?.remove()
+})
 </script>
 
 <template>
   <q-page class="home-page">
 
     <!-- ═══════════════════════════════════ HERO ═══════════════════════════════════ -->
+    <Reveal>
     <section class="hero">
       <div class="hero-left">
         <div class="hero-badge">
@@ -141,16 +191,20 @@ const benefits = [
         </div>
       </div>
     </section>
+    </Reveal>
 
     <!-- ═══════════════════════════════════ STATS ═══════════════════════════════════ -->
+    <Reveal :delay="80">
     <div class="stats-bar">
       <div v-for="s in stats" :key="s.label" class="stat-item">
         <span class="stat-value">{{ s.value }}</span>
         <span class="stat-label">{{ s.label }}</span>
       </div>
     </div>
+    </Reveal>
 
     <!-- ═══════════════════════════════════ DOCUMENT TYPES ═══════════════════════════════════ -->
+    <Reveal>
     <section class="docs-section">
       <div class="section-head">
         <h2>Everything you need, one place</h2>
@@ -225,8 +279,10 @@ const benefits = [
 
       </div>
     </section>
+    </Reveal>
 
     <!-- ═══════════════════════════════════ HOW IT WORKS ═══════════════════════════════════ -->
+    <Reveal>
     <section class="steps-section">
       <h2 class="steps-title">How it works</h2>
       <div class="steps-row">
@@ -255,8 +311,10 @@ const benefits = [
         </div>
       </div>
     </section>
+    </Reveal>
 
     <!-- ═══════════════════════════════════ BENEFITS ═══════════════════════════════════ -->
+    <Reveal>
     <section class="benefits-section">
       <div class="section-head">
         <h2>Why ResumeIO</h2>
@@ -274,8 +332,47 @@ const benefits = [
         </div>
       </div>
     </section>
+    </Reveal>
+
+    <!-- ═══════════════════════════════════ FAQ ═══════════════════════════════════ -->
+    <Reveal>
+    <section class="faq-section">
+      <div class="section-head">
+        <h2>Frequently asked questions</h2>
+        <p>Everything you need to know about ResumeIO.</p>
+      </div>
+
+      <div class="faq-list">
+        <div
+          v-for="(item, i) in faqs"
+          :key="item.q"
+          class="faq-item"
+          :class="{ 'faq-item--open': openFaq === i }"
+        >
+          <h3 class="faq-q-wrap">
+            <button
+              type="button"
+              class="faq-question"
+              :aria-expanded="openFaq === i"
+              :aria-controls="`faq-panel-${i}`"
+              @click="openFaq = openFaq === i ? null : i"
+            >
+              <span>{{ item.q }}</span>
+              <q-icon name="mdi-chevron-down" size="22px" class="faq-chevron" />
+            </button>
+          </h3>
+          <q-slide-transition>
+            <div v-show="openFaq === i" :id="`faq-panel-${i}`">
+              <p class="faq-answer">{{ item.a }}</p>
+            </div>
+          </q-slide-transition>
+        </div>
+      </div>
+    </section>
+    </Reveal>
 
     <!-- ═══════════════════════════════════ FINAL CTA ═══════════════════════════════════ -->
+    <Reveal>
     <section class="cta-section">
       <div class="cta-inner">
         <h2>Ready to land your next job?</h2>
@@ -301,6 +398,7 @@ const benefits = [
         </div>
       </div>
     </section>
+    </Reveal>
 
   </q-page>
 </template>
@@ -576,6 +674,10 @@ const benefits = [
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: background-color 0.3s ease;
+}
+.stat-item:hover {
+  background: rgba(var(--q-primary-rgb, 35, 159, 85), 0.04);
 }
 .stat-item:last-child { border-right: none; }
 
@@ -843,6 +945,10 @@ const benefits = [
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.benefit-item:hover .benefit-icon {
+  transform: scale(1.1);
 }
 
 .benefit-title {
@@ -857,6 +963,77 @@ const benefits = [
   color: #64748b;
   line-height: 1.65;
   margin: 0;
+}
+
+/* ─── FAQ ────────────────────────────────────────────────────────────────────── */
+.faq-section {
+  padding-bottom: 64px;
+}
+
+.faq-list {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faq-item--open {
+  border-color: rgba(var(--q-primary-rgb, 35, 159, 85), 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.faq-q-wrap {
+  margin: 0;
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 20px 24px;
+  text-align: left;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0f172a;
+  transition: color 0.3s ease;
+}
+
+.faq-item--open .faq-question {
+  color: var(--q-primary);
+}
+
+.faq-chevron {
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.faq-item--open .faq-chevron {
+  transform: rotate(180deg);
+  color: var(--q-primary);
+}
+
+.faq-answer {
+  margin: 0;
+  padding: 0 24px 20px;
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.7;
 }
 
 /* ─── FINAL CTA ──────────────────────────────────────────────────────────────── */
